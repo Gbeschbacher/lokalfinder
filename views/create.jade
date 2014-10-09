@@ -1,0 +1,9 @@
+extends master_template
+
+block content
+    h1 #{title}
+    form#newQuestion(name="newquestion", method="post", action="/questions/create")
+        input#question(type="text", placeholder="question", name="question")
+        input#answer1(type="text", placeholder="answer to question", name="answer1")
+        input#answer2(type="text", placeholder="answer to question", name="answer2")
+        button#btnSubmit(type="submit") submit
