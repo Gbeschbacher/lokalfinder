@@ -1,0 +1,142 @@
+{
+  "version": 0.6,
+  "generator": "Overpass API",
+  "osm3s": {
+    "timestamp_osm_base": "2014-10-12T11:43:02Z",
+    "copyright": "The data included in this document is from www.openstreetmap.org. The data is made available under ODbL."
+  },
+  "elements": [
+
+{
+  "type": "node",
+  "id": 114275664,
+  "lat": 47.7089028,
+  "lon": 13.1320153,
+  "tags": {
+    "amenity": "restaurant",
+    "name": "Gatshof SeefeldmГјhle"
+  }
+},
+{
+  "type": "node",
+  "id": 116111574,
+  "lat": 47.6647112,
+  "lon": 13.0807970,
+  "tags": {
+    "amenity": "restaurant",
+    "name": "Kranzbichlhof"
+  }
+},
+{
+  "type": "node",
+  "id": 116111579,
+  "lat": 47.6633218,
+  "lon": 13.0766774,
+  "tags": {
+    "amenity": "restaurant",
+    "name": "Grenzgasthof NeuhГ¤usl"
+  }
+},
+{
+  "type": "node",
+  "id": 132269249,
+  "lat": 47.7181909,
+  "lon": 13.1263644,
+  "tags": {
+    "amenity": "restaurant",
+    "name": "Gasthof Bischof"
+  }
+},
+{
+  "type": "node",
+  "id": 137569762,
+  "lat": 47.7169482,
+  "lon": 13.0909996,
+  "tags": {
+    "amenity": "restaurant",
+    "name": "Gasthof Kirchenwirt"
+  }
+},
+{
+  "type": "node",
+  "id": 276047487,
+  "lat": 47.7195585,
+  "lon": 13.0985858,
+  "tags": {
+    "amenity": "restaurant",
+    "cuisine": "regional",
+    "name": "Gasthof David",
+    "website": "http://gasthof-david.stadtausstellung.at/"
+  }
+},
+{
+  "type": "node",
+  "id": 469630699,
+  "lat": 47.7166886,
+  "lon": 13.0615536,
+  "tags": {
+    "addr:city": "Hallein",
+    "addr:country": "AT",
+    "addr:housenumber": "84",
+    "addr:postcode": "5400",
+    "addr:street": "SalzburgerstraГџe",
+    "amenity": "restaurant",
+    "email": "gasthof@hohlwegwirt.at",
+    "fax": "+43  (0)6245 / 82415-72",
+    "name": "Gasthof Hohlwegwirt",
+    "phone": "+43 (0)6245 / 82415-0",
+    "tourism": "hotel",
+    "website": "http://www.hohlwegwirt.at"
+  }
+},
+{
+  "type": "node",
+  "id": 496804587,
+  "lat": 47.7042775,
+  "lon": 13.0686594,
+  "tags": {
+    "addr:city": "Hallein",
+    "addr:country": "AT",
+    "addr:housenumber": "42",
+    "addr:postcode": "5400",
+    "addr:street": "SalzburgerstraГџe",
+    "amenity": "restaurant",
+    "cuisine": "local;fish;grill",
+    "name": "Auwirt",
+    "tourism": "hotel",
+    "website": "http://www.auwirt.com/"
+  }
+},
+{
+  "type": "node",
+  "id": 503865700,
+  "lat": 47.6940465,
+  "lon": 13.0782170,
+  "tags": {
+    "addr:city": "Hallein",
+    "addr:country": "AT",
+    "addr:housenumber": "67",
+    "addr:postcode": "5400",
+    "addr:street": "SalzburgerstraГџe",
+    "amenity": "restaurant",
+    "beer_garden": "yes",
+    "email": "info@kaltenhausen.at",
+    "name": "Braugasthof HofbrГ¤u Kaltenhausen",
+    "phone": "+43 (0)6245  80233",
+    "website": "http://www.kaltenhausen.at/"
+  }
+},
+{
+  "type": "node",
+  "id": 1059112888,
+  "lat": 47.6849263,
+  "lon": 13.1005563,
+  "tags": {
+    "amenity": "restaurant",
+    "name": "Seidlwirt",
+    "source": "Bing"
+  }
+}
+
+  ]
+}
