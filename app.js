@@ -5,11 +5,16 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
-var mongo = require('mongoskin');
-var db = mongo.db('mongodb://localhost:27017/lokalfinder', {native_parser: true});
+/*var mongo = require('mongoskin');
+var db = mongo.db('mongodb://localhost:27017/lokalfinder', {native_parser: true});*/
+var mongoose = require('mongoose');
+mongoose.connect('mongodb://localhost:27017/lokalfinder');
+
+var db = mongoose.connection;
+db.on('error', console.error.bind(console, 'connection error:'));
+db.once('open', function callback () {});
 
 var routes = require('./routes/index');
-var questions = require('./routes/questions');
 
 var app = express();
 
@@ -31,8 +36,10 @@ app.use(function(req, res, next){
     next();
 });
 
-app.use('/', routes);
-app.use('/questions', questions);
+// app.use('/', routes);
+app.get('/', routes.index);
+app.get('/partials/:name', routes.partials);
+app.get('*', routes.index);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
