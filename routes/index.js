@@ -20,6 +20,12 @@ exports.list = function(req, res){
     });
 };
 
+exports.listItem = function(req, res){
+    Poll.findById(req.params.id, function(error, poll){
+        res.send(poll);
+    });
+};
+
 exports.poll = function(req, res){
     var pollId = req.params.id;
     Poll.findById(pollId, '', { lean: true }, function(err, poll) {

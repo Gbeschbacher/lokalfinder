@@ -4,19 +4,24 @@ pollsControler.controller('PollListCtrl', ['$scope', 'Poll',
     function ($scope, Poll) {
         $scope.polls = [];
         $scope.polls = Poll.query();
-        console.log(Poll.query());
     }
 ]);
 
 pollsControler.controller('PollItemCtrl', ['$scope', '$routeParams', 'Poll',
     function ($scope, $routeParams, Poll) {
-        $scope.poll = Poll.get({pollId: $routeParams.pollId});
+
+        Poll.get({
+            _id: $routeParams.pollId
+        }, function(data){
+            $scope.poll = data;
+        });
+
         $scope.vote = function() {};
     }
 ]);
 
 pollsControler.controller('PollNewCtrl', ['$scope', '$location', 'Poll',
-    function ($scope, $location,Poll) {
+    function ($scope, $location, Poll) {
         $scope.poll = {
             question: '',
             choices: [{ text: '' }, { text: '' }, { text: '' }]
@@ -40,7 +45,7 @@ pollsControler.controller('PollNewCtrl', ['$scope', '$location', 'Poll',
                     var newPoll = new Poll(poll);
                     newPoll.$save(function(p, resp){
                         if(!p.error){
-                            $location.path('questions');
+                            $location.path('polls');
                         } else {
                             alert('could not create poll');
                         }

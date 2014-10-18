@@ -1,9 +1,5 @@
-angular.module('pollServices', ['ngResource']).factory('Poll', function($resource) {
-    return $resource('polls/:pollId', {}, {
-        query: {
-            method: 'GET',
-            params: { pollId: 'polls' },
-            isArray: true
-        }
-    })
+var service = angular.module('pollServices',['ngResource']);
+
+service.factory('Poll', function($resource){
+    return $resource('/polls/:_id');
 });
