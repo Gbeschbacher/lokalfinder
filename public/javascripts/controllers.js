@@ -7,8 +7,8 @@ pollsControler.controller('PollListCtrl', ['$scope', 'Poll',
     }
 ]);
 
-pollsControler.controller('PollItemCtrl', ['$scope', '$routeParams', 'Poll',
-    function ($scope, $routeParams, Poll) {
+pollsControler.controller('PollItemCtrl', ['$scope', '$routeParams', 'Poll', 'socket',
+    function ($scope, $routeParams, Poll, socket) {
 
         Poll.get({
             _id: $routeParams.pollId
@@ -16,7 +16,32 @@ pollsControler.controller('PollItemCtrl', ['$scope', '$routeParams', 'Poll',
             $scope.poll = data;
         });
 
-        $scope.vote = function() {};
+        socket.on('myvote', function(data){
+            console.dir(data);
+            if(data._id === $routeParams.pollId){
+                $scope.poll = data;
+            }
+        });
+
+        socket.on('vote', function(data){
+            console.dir(data);
+            if(data._id === $routeParams.pollId){
+                $scope.poll.choices = data.choices;
+                $scope.poll.totalVotes = data.totalVotes;
+            }
+        })
+
+        $scope.vote = function() {
+            var pollId = $scope.poll._id,
+                choiceId = $scope.poll.userVote;
+
+            if(choiceId){
+                var voteObj = {poll_id:pollId, choice: choiceId};
+                socket.emit('send:vote', voteObj);
+            } else {
+                console.log("ERROR - SELECT OPTION TO VOTE");
+            }
+        };
     }
 ]);
 
