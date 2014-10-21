@@ -21,13 +21,13 @@
 14 error node v0.11.14
 15 error npm  v2.0.0
 16 error code ELIFECYCLE
-17 error lokalfinder@0.0.0 start: `node ./bin/www`
+17 error lokalfinder@0.0.0 start: `node app.js`
 17 error Exit status 1
 18 error Failed at the lokalfinder@0.0.0 start script.
 18 error This is most likely a problem with the lokalfinder package,
 18 error not with npm itself.
 18 error Tell the author that this fails on your system:
-18 error     node ./bin/www
+18 error     node app.js
 18 error You can get their info via:
 18 error     npm owner ls lokalfinder
 18 error There is likely additional logging output above.
