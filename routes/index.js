@@ -70,13 +70,14 @@ exports.create = function(req, res) {
     });
 };
 
-exports.vote = function(socket) {
-    console.log("ROUTE VOTE")
+exports.vote = function(socket, req, res) {
     socket.on('send:vote', function(data) {
-        console.log("SEND:VOTE");
-        var ip = socket.handshake.headers['x-forwarded-for'] || socket.handshake.address.address;
+
+        var ip = socket.handshake.headers['x-forwarded-for'] || socket.handshake.address.address || socket.handshake.address;
 
         Poll.findById(data.poll_id, function(err, poll) {
+
+            console.log(ip)
 
             var choice = poll.choices.id(data.choice);
             choice.votes.push({ ip: ip });
@@ -84,8 +85,11 @@ exports.vote = function(socket) {
             poll.save(function(err, doc) {
 
                 var theDoc = {
-                    question: doc.question, _id: doc._id, choices: doc.choices,
-                    userVoted: false, totalVotes: 0
+                     _id: doc._id,
+                    question: doc.question,
+                     choices: doc.choices,
+                    userVoted: false,
+                    totalVotes: 0
                 };
 
                 for(var i = 0, ln = doc.choices.length; i < ln; i++) {
