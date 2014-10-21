@@ -75,9 +75,17 @@ exports.vote = function(socket, req, res) {
 
         var ip = socket.handshake.headers['x-forwarded-for'] || socket.handshake.address.address || socket.handshake.address;
 
-        Poll.findById(data.poll_id, function(err, poll) {
+        console.log("*******************************");
+        console.log("IP");
+        console.log(ip)
+        console.log("SOCKET HANDSHAKE HEADERS");
+        console.log(socket.handshake.headers['x-forwarded-for'] )
+        console.log("SOCKET HANDSHAKE ADDRESS");
+        console.log(socket.handshake.address.address)
+        console.log(socket.handshake.address)
+        console.log("*******************************");
 
-            console.log(ip)
+        Poll.findById(data.poll_id, function(err, poll) {
 
             var choice = poll.choices.id(data.choice);
             choice.votes.push({ ip: ip });
@@ -101,6 +109,7 @@ exports.vote = function(socket, req, res) {
                         theDoc.ip = ip;
 
                         if(vote.ip === ip) {
+                            console.log("USER VOTED");
                             theDoc.userVoted = true;
                             theDoc.userChoice = { _id: choice._id, text: choice.text };
                         }
