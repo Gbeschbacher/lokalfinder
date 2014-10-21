@@ -17,14 +17,12 @@ pollsControler.controller('PollItemCtrl', ['$scope', '$routeParams', 'Poll', 'so
         });
 
         socket.on('myvote', function(data){
-            console.dir(data);
             if(data._id === $routeParams.pollId){
                 $scope.poll = data;
             }
         });
 
         socket.on('vote', function(data){
-            console.dir(data);
             if(data._id === $routeParams.pollId){
                 $scope.poll.choices = data.choices;
                 $scope.poll.totalVotes = data.totalVotes;
