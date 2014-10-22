@@ -41,8 +41,6 @@ pollsControler.controller('PollItemCtrl', ['$scope', '$routeParams', 'Poll', 'so
             if(choiceId){
                 var voteObj = {poll_id:pollId, choice: choiceId};
                 socket.emit('send:vote', voteObj);
-            } else {
-                console.log("ERROR - SELECT OPTION TO VOTE");
             }
         };
     }
@@ -50,39 +48,42 @@ pollsControler.controller('PollItemCtrl', ['$scope', '$routeParams', 'Poll', 'so
 
 pollsControler.controller('PollNewCtrl', ['$scope', '$location', 'Poll', 'NewPollCategoryService',
     function ($scope, $location, Poll, NewPollCategoryService) {
-        $scope.category = NewPollCategoryService.getCategory();
-        $scope.poll = {
-            question: '',
-            choices: [{ text: '' }, { text: '' }, { text: '' }]
-        };
 
-        $scope.addChoice = function() {
-            $scope.poll.choices.push({ text: '' });
+        $scope.category = NewPollCategoryService.getCategory();
+
+        $scope.poll = {
+            category: $scope.category,
+            choices: []
         };
 
         $scope.createQuestion = function() {
-            var poll = $scope.poll;
-            if(poll.question.length> 0){
-                var choiceCount = 0;
-                for(var i=0, ln = poll.choices.length; i<ln; i++){
-                    var choice = poll.choices[i];
-                    if(choice.text.length > 0){
-                        choiceCount++;
-                    }
-                }
-                if(choiceCount > 1){
-                    var newPoll = new Poll(poll);
-                    newPoll.$save(function(p, resp){
-                        if(!p.error){
-                            $location.path('polls');
-                        } else {
-                            alert('could not create poll');
-                        }
-                    });
+
+           if(typeof $scope.restaurantSelection != 'undefined'){
+                $scope.poll.choices = [
+                    {text: "Ja"},
+                    {text: "Nein"},
+                    {text: "Keine Lust"},
+                ]
+           }else if (typeof $scope.categorySelection != 'undefined'){
+
+            /*
+            write all available restaurants from the chosen category to var
+                $scope.poll.choices = [{], {}, {}]
+            */
+           }else {
+                console.log("THIS SHOULD NEVER EVER HAPPEN");
+           }
+
+            var newPoll = new Poll($scope.poll);
+
+           //IF $SCOPE.CATEGORY === FALSE --> RESTAURANT MENU
+            newPoll.$save(function(p, resp){
+                if(!p.error){
+                    $location.path('poll/'+p._id);
                 } else {
-                    alert('enter at least 2 choices');
                 }
-            };
+            });
+
         };
 
         var latitude;
@@ -120,7 +121,7 @@ pollsControler.controller('PollNewCtrl', ['$scope', '$location', 'Poll', 'NewPol
             initRestaurants(); // show restaurant category picker
         }
         else {
-            $window.location.href = '/';
+            $location.path("polls");
         }
     }
     getLocation();
@@ -166,8 +167,8 @@ pollsControler.controller('PollNewCtrl', ['$scope', '$location', 'Poll', 'NewPol
     });
 
     $("#selectRestaurant").on("change", function() {
-        restaurantSelection = $('#selectRestaurant').select2('data');
-        alert(JSON.stringify(restaurantSelection));
+        $scope.restaurantSelection = $('#selectRestaurant').select2('data');
+        //alert(JSON.stringify(restaurantSelection));
     });
 
     $('#selectCategory').select2({
@@ -178,8 +179,8 @@ pollsControler.controller('PollNewCtrl', ['$scope', '$location', 'Poll', 'NewPol
     });
 
     $("#selectCategory").on("change", function() {
-        categorySelection = $('#selectCategory').select2('data');
-        alert(JSON.stringify(categorySelection));
+        $scope.categorySelection = $('#selectCategory').select2('data');
+        //alert(JSON.stringify(categorySelection));
     });
 }
 ]);

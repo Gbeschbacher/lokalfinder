@@ -40,5 +40,5 @@ polls.service('NewPollCategoryService', [ function() {
     category = value;
   };
 
-return this;
+  return this;
 }]);

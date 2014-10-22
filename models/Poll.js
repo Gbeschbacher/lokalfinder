@@ -8,6 +8,6 @@ var choiceSchema = new mongoose.Schema({
 });
 
 exports.PollSchema = new mongoose.Schema({
-    question: { type: String, required: true },
+    category: { type: Boolean, required: true },
     choices: [choiceSchema]
 });
