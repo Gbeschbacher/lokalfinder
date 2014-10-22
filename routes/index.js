@@ -70,7 +70,7 @@ exports.create = function(req, res) {
     });
 };
 
-exports.vote = function(socket, req, res) {
+exports.vote = function(socket,) {
 
     socket.on('send:vote', function(data) {
 
@@ -80,10 +80,11 @@ exports.vote = function(socket, req, res) {
         console.log("IP");
         console.log(ip)
         console.log("SOCKET HANDSHAKE HEADERS");
-        console.log(socket.handshake.headers['x-forwarded-for'] )
+        console.log(socket.handshake.headers['X-Forwarded-For'] );
         console.log("SOCKET HANDSHAKE ADDRESS");
-        console.log(socket.handshake.address.address)
-        console.log(socket.handshake.address)
+        console.log(socket.handshake.address.address);
+        console.log(socket.handshake.address);
+        console.log(socket);
         console.log("*******************************");
 
         Poll.findById(data.poll_id, function(err, poll) {
