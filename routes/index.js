@@ -6,7 +6,7 @@ var Poll = db.model('polls', PollSchema);
 
 exports.index = function(req, res){
     res.render('index', {
-        title: 'Polls'
+        title: 'Lokalfinder'
     });
 };
 
