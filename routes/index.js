@@ -70,17 +70,17 @@ exports.create = function(req, res) {
     });
 };
 
-exports.vote = function(socket,) {
+exports.vote = function(socket) {
 
     socket.on('send:vote', function(data) {
 
-        var ip = socket.handshake.headers['x-forwarded-for'] || socket.handshake.address.address || socket.handshake.address;
+        var ip = socket.handshake.headers['x-forwardd-for'] || socket.handshake.address.address || socket.handshake.address;
 
         console.log("*******************************");
         console.log("IP");
         console.log(ip)
         console.log("SOCKET HANDSHAKE HEADERS");
-        console.log(socket.handshake.headers['X-Forwarded-For'] );
+        console.log(socket.handshake.headers['X-Forwardd-For'] );
         console.log("SOCKET HANDSHAKE ADDRESS");
         console.log(socket.handshake.address.address);
         console.log(socket.handshake.address);
