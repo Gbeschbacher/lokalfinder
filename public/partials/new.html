@@ -1,24 +1,18 @@
 <div class="page-header">
-    <h1>Create New Poll</h1>
+    <h1>Frage deine Freunde</h1>
 </div>
+
 <form role="form" ng-submit="createPoll()">
+    <div ng-show="!category">
     <div class="form-group">
-        <label for="pollQuestion">Question</label>
-        <input type="text" ng-model="poll.question" class="form-control"
-        id="pollQuestion" placeholder="Enter poll question">
+        <label for="selectRestaurant">Habt ihr Lust auf einen Besuch im Restaurant...</label>
+        <input id="selectRestaurant"></input><label for="selectRestaurant">?</label>
     </div>
+    </div>
+    <div ng-show="category">
     <div class="form-group">
-        <label>Choices</label>
-        <div ng-repeat="choice in poll.choices">
-            <input type="text" ng-model="choice.text" class="form-control"
-            placeholder="Enter choice {{$index+1}} text"><br>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-xs-12">
-            <button type="button" class="btn btn-default" ng-click=
-            "addChoice()"><span class="glyphicon glyphicon-plus">
-        </span> Add another</button>
+        <label for="selectCategory">Ich habe Lust auf...</label>
+        <input id="selectCategory"></input>
     </div>
 </div>
 <p><hr></p>
@@ -26,12 +20,12 @@
     <div class="col-xs-6">
         <a href="polls" class="btn btn-default" role="button">
             <span class="glyphicon glyphicon-arrow-left"></span>
-            Back to Poll List</a>
+            Zurück zur Übersicht</a>
         </div>
         <div class="col-xs-6">
             <button class="btn btn-primary pull-right" type="submit" ng-click=
             "createQuestion()">
-                Create Poll &raquo;</button>
+                Erstelle eine Umfrage &raquo;</button>
             </div>
         </div>
         <p>&nbsp;</p>
