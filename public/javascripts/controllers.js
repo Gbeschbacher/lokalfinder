@@ -106,7 +106,7 @@ pollsControler.controller('PollNewCtrl', ['$scope', '$location', 'Poll', 'NewPol
         };
 
      function showPosition(position) {
-        var range = 0.05,
+        var range = 10.05,
             latitude = parseFloat(position.coords.latitude).toFixed(2),
             longitude = parseFloat(position.coords.longitude).toFixed(2);
 
@@ -153,6 +153,7 @@ pollsControler.controller('PollNewCtrl', ['$scope', '$location', 'Poll', 'NewPol
     // get openstreetmap JSON data from overpass API and save relevant data to variable osmJSON
     function initCategories(coords) {
         var url = "http://overpass.osm.rambler.ru/cgi/interpreter?data=[out:json];node[amenity=restaurant][cuisine]("+coords.latitudeL+","+coords.longitudeL+","+coords.latitudeR+","+coords.longitudeR+");out;";
+
 
         $.getJSON(url, function(json){
 
