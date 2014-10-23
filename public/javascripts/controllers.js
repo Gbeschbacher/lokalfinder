@@ -86,77 +86,91 @@ pollsControler.controller('PollNewCtrl', ['$scope', '$location', 'Poll', 'NewPol
 
         };
 
-        var latitude;
-        var longitude;
-        var range;
-        var latitudeR;
-        var longitudeR;
-        var dataJSON;
-        var osmRestaurantsJSON = [];
-        var osmCategoryJSON = [];
-        var url;
-        var restaurantSelection;
-        var categorySelection;
+        /*
+            Helper Functions
+        */
+
+        function _checkForDoubleCategory(obj, x) {
+            for (var i = 0; i < obj.length || x == obj[i].text; i++) {
+                    return true;
+            }
+            return false;
+        }
 
         function getLocation() {
-           if (navigator.geolocation) {
+            if (navigator.geolocation) {
                navigator.geolocation.getCurrentPosition(showPosition);
-           } else {
+            } else {
              // filler text ... geolocation not supported by client
-         }
-     }
+            }
+        };
 
      function showPosition(position) {
-        latitude = parseFloat(position.coords.latitude).toFixed(2);
-        longitude = parseFloat(position.coords.longitude).toFixed(2);
-        range = parseFloat('0.05');
-        latitudeL = parseFloat(latitude) - range;
-        longitudeL = parseFloat(longitude) - range;
-        latitudeR = parseFloat(latitude) + range;
-        longitudeR = parseFloat(longitude) + range;
+        var range = 0.05,
+            latitude = parseFloat(position.coords.latitude).toFixed(2),
+            longitude = parseFloat(position.coords.longitude).toFixed(2);
+
+        var coords = {
+            longitudeL: parseFloat(longitude) - range,
+            latitudeL: parseFloat(latitude) - range,
+            latitudeR: parseFloat(latitude) + range,
+            longitudeR: parseFloat(longitude) + range
+        };
+
         if ($scope.category === true) {
-            initCategories(); // show cuisine/food category picker
+            initCategories(coords); // show cuisine/food category picker
         }
         else if ($scope.category === false) {
-            initRestaurants(); // show restaurant category picker
+            initRestaurants(coords); // show restaurant category picker
         }
         else {
-            $location.path("polls");
+            $location.path("/");
         }
     }
     getLocation();
 
-    function checkForDoubleCategory(x) {
-        for (var i = 0; i < osmCategoryJSON.length; i++) {
-            if (x == osmCategoryJSON[i].text) {
-                return true;
-                break;
+
+    var osmCategoryJSON = osmRestaurantsJSON = [];
+
+    // get openstreetmap JSON data from overpass API and save relevant data to variable osmJSON
+    function initRestaurants(coords) {
+        var url = "http://overpass.osm.rambler.ru/cgi/interpreter?data=[out:json];node[amenity=restaurant]("+coords.latitudeL+","+coords.longitudeL+","+coords.latitudeR+","+coords.longitudeR+");out;";
+
+        $.getJSON(url, function(json){
+
+            for (var i = 0; i < json.elements.length; i++) {
+                osmRestaurantsJSON.push({
+                    "id": i+1 ,
+                    "text": json.elements[i].tags.name ,
+                    "osm-id":json.elements[i].id,
+                    "lat":json.elements[i].lat ,
+                    "lon":json.elements[i].lon
+                });
             }
-        }
-        return false;
+
+        });
     }
 
     // get openstreetmap JSON data from overpass API and save relevant data to variable osmJSON
-    function initRestaurants() {
-        url = "http://overpass.osm.rambler.ru/cgi/interpreter?data=[out:json];node[amenity=restaurant]("+latitudeL+","+longitudeL+","+latitudeR+","+longitudeR+");out;";
+    function initCategories(coords) {
+        var url = "http://overpass.osm.rambler.ru/cgi/interpreter?data=[out:json];node[amenity=restaurant][cuisine]("+coords.latitudeL+","+coords.longitudeL+","+coords.latitudeR+","+coords.longitudeR+");out;";
+
         $.getJSON(url, function(json){
-           for (var i = 0; i < json.elements.length; i++) {
-            osmRestaurantsJSON.push({"id":i+1 , "text":json.elements[i].tags.name , "osm-id":json.elements[i].id, "lat":json.elements[i].lat , "lon":json.elements[i].lon})
-        }
-    });
-    }
-    // get openstreetmap JSON data from overpass API and save relevant data to variable osmJSON
-    function initCategories() {
-        url = "http://overpass.osm.rambler.ru/cgi/interpreter?data=[out:json];node[amenity=restaurant]("+latitudeL+","+longitudeL+","+latitudeR+","+longitudeR+");out;";
-        $.getJSON(url, function(json){
-           for (var i = 0; i < json.elements.length; i++) {
-                if (json.elements[i].tags.hasOwnProperty('cuisine')) {
-                    if (!checkForDoubleCategory(json.elements[i].tags.cuisine)) {
-                        osmCategoryJSON.push({"id":i+1 , "text":json.elements[i].tags.cuisine , "osm-id":json.elements[i].id, "lat":json.elements[i].lat , "lon":json.elements[i].lon})
+
+            for (var i = 0; i < json.elements.length; i++) {
+                    if (!_checkForDoubleCategory(osmCategoryJSON,json.elements[i].tags.cuisine)) {
+
+                        osmCategoryJSON.push({
+                            "id":i+1 ,
+                            "text":json.elements[i].tags.cuisine ,
+                            "osm-id":json.elements[i].id,
+                            "lat":json.elements[i].lat ,
+                            "lon":json.elements[i].lon
+                        });
+
                     }
-            }
-        }
-    });
+                }
+        });
     }
 
     $('#selectRestaurant').select2({
@@ -166,10 +180,6 @@ pollsControler.controller('PollNewCtrl', ['$scope', '$location', 'Poll', 'NewPol
         width: "200px"
     });
 
-    $("#selectRestaurant").on("change", function() {
-        $scope.restaurantSelection = $('#selectRestaurant').select2('data');
-        //alert(JSON.stringify(restaurantSelection));
-    });
 
     $('#selectCategory').select2({
         data: osmCategoryJSON,
@@ -178,9 +188,15 @@ pollsControler.controller('PollNewCtrl', ['$scope', '$location', 'Poll', 'NewPol
         width: "200px"
     });
 
+    $("#selectRestaurant").on("change", function() {
+        $scope.restaurantSelection = $('#selectRestaurant').select2('data');
+    });
+
+
     $("#selectCategory").on("change", function() {
         $scope.categorySelection = $('#selectCategory').select2('data');
-        //alert(JSON.stringify(categorySelection));
     });
 }
 ]);
+
+

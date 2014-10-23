@@ -68,10 +68,9 @@ exports.create = function(req, res) {
         if(err || !doc) {
             throw 'Error';
         } else {
-            console.log("hi?!");
             res.json(doc);
         }
-    })
+    });
 };
 
 exports.vote = function(socket, req, res) {

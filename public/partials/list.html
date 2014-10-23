@@ -3,11 +3,11 @@
 </div>
 <div class="row">
     <div class="col-xs-5">
-        <a href="new" ng-click="category=false; newPoll()" class="btn btn-default">
+        <a href="poll/create" ng-click="category=false; newPoll()" class="btn btn-default">
             <span class="glyphicon glyphicon-plus"></span>
             Restaurant
         </a>
-        <a href="new" ng-click="category=true; newPoll();" class="btn btn-default">
+        <a href="poll/create" ng-click="category=true; newPoll();" class="btn btn-default">
             <span class="glyphicon glyphicon-plus"></span>
             Küche
         </a>
@@ -27,7 +27,7 @@
 <div class="row" ng-switch on="polls.length">
     <ul ng-switch-when="0">
         <li>
-            <em>Keine Umfragen in der Datenbank. Willst du eine neue <a href="new">Umfrage erstellen</a>?
+            <em>Keine Umfragen in der Datenbank. Willst du eine neue <a href="poll/create">Umfrage erstellen</a>?
         </li>
     </ul>
 
