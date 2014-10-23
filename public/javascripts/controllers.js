@@ -154,29 +154,28 @@ pollsControler.controller('PollNewCtrl', ['$scope', '$location', 'Poll', 'NewPol
     function initCategories(coords) {
         var url = "http://overpass.osm.rambler.ru/cgi/interpreter?data=[out:json];node[amenity=restaurant][cuisine]("+coords.latitudeL+","+coords.longitudeL+","+coords.latitudeR+","+coords.longitudeR+");out;";
 
-
         $.getJSON(url, function(json){
-
             for (var i = 0; i < json.elements.length; i++) {
-                    if (!_checkForDoubleCategory(osmCategoryJSON,json.elements[i].tags.cuisine)) {
+                osmCategoryRestaurantsJSON.push({
+                    "id":i+1 ,
+                    "name":json.elements[i].tags.name ,
+                    "cuisine":json.elements[i].tags.cuisine ,
+                    "osmid":json.elements[i].id,
+                    "lat":json.elements[i].lat ,
+                    "lon":json.elements[i].lon
+                });
+                
+                // prohibit double entries to get a JSON with unique foods/cuisines
+                if (!_checkForDoubleCategory(osmCategoryJSON,json.elements[i].tags.cuisine)) {
 
-                        osmCategoryJSON.push({
-                            "id":i+1 ,
-                            "text":json.elements[i].tags.cuisine ,
-                            "osmid":json.elements[i].id,
-                            "lat":json.elements[i].lat ,
-                            "lon":json.elements[i].lon
-                        });
-                    }
-
-                    osmCategoryRestaurantsJSON.push({
+                    osmCategoryJSON.push({
                         "id":i+1 ,
-                        "name":json.elements[i].tags.name ,
-                        "cuisine":json.elements[i].tags.cuisine ,
+                        "text":json.elements[i].tags.cuisine ,
                         "osmid":json.elements[i].id,
                         "lat":json.elements[i].lat ,
                         "lon":json.elements[i].lon
                     });
+                }
             }
         });
     }
