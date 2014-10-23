@@ -130,19 +130,18 @@ pollsControler.controller('PollNewCtrl', ['$scope', '$location', 'Poll', 'NewPol
     getLocation();
 
 
-    var osmCategoryJSON = osmRestaurantsJSON = [];
+    var osmCategoryJSON = osmRestaurantsJSON = osmCategoryRestaurantsJSON = cuisineRestaurants = [];
 
     // get openstreetmap JSON data from overpass API and save relevant data to variable osmJSON
     function initRestaurants(coords) {
         var url = "http://overpass.osm.rambler.ru/cgi/interpreter?data=[out:json];node[amenity=restaurant]("+coords.latitudeL+","+coords.longitudeL+","+coords.latitudeR+","+coords.longitudeR+");out;";
 
         $.getJSON(url, function(json){
-
             for (var i = 0; i < json.elements.length; i++) {
                 osmRestaurantsJSON.push({
                     "id": i+1 ,
                     "text": json.elements[i].tags.name ,
-                    "osm-id":json.elements[i].id,
+                    "osmid":json.elements[i].id,
                     "lat":json.elements[i].lat ,
                     "lon":json.elements[i].lon
                 });
@@ -163,14 +162,37 @@ pollsControler.controller('PollNewCtrl', ['$scope', '$location', 'Poll', 'NewPol
                         osmCategoryJSON.push({
                             "id":i+1 ,
                             "text":json.elements[i].tags.cuisine ,
-                            "osm-id":json.elements[i].id,
+                            "osmid":json.elements[i].id,
                             "lat":json.elements[i].lat ,
                             "lon":json.elements[i].lon
                         });
-
                     }
-                }
+
+                    osmCategoryRestaurantsJSON.push({
+                        "id":i+1 ,
+                        "name":json.elements[i].tags.name ,
+                        "cuisine":json.elements[i].tags.cuisine ,
+                        "osmid":json.elements[i].id,
+                        "lat":json.elements[i].lat ,
+                        "lon":json.elements[i].lon
+                    });
+            }
         });
+    }
+
+    function addCategoryRestaurants() {
+        for (var i = 0; i < osmCategoryRestaurantsJSON.length; i++) {
+            if (osmCategoryRestaurantsJSON[i].cuisine === $scope.categorySelection.text) {
+                cuisineRestaurants.push({
+                    "id":osmCategoryRestaurantsJSON[i].id ,
+                    "name":osmCategoryRestaurantsJSON[i].name ,
+                    "cuisine":osmCategoryRestaurantsJSON[i].cuisine ,
+                    "osmid":osmCategoryRestaurantsJSON[i].osmid,
+                    "lat":osmCategoryRestaurantsJSON[i].lat ,
+                    "lon":osmCategoryRestaurantsJSON[i].lon
+                });
+            }
+        }
     }
 
     $('#selectRestaurant').select2({
@@ -195,6 +217,7 @@ pollsControler.controller('PollNewCtrl', ['$scope', '$location', 'Poll', 'NewPol
 
     $("#selectCategory").on("change", function() {
         $scope.categorySelection = $('#selectCategory').select2('data');
+        addCategoryRestaurants();
     });
 }
 ]);
