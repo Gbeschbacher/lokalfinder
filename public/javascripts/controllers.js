@@ -93,6 +93,8 @@ pollsControler.controller('PollNewCtrl', ['$scope', '$location', 'Poll', 'NewPol
         var dataJSON;
         var osmRestaurantsJSON = [];
         var osmCategoryJSON = [];
+        var osmCategoryRestaurantsJSON = [];
+        var cuisineRestaurants = [];
         var url;
         var restaurantSelection;
         var categorySelection;
@@ -140,7 +142,7 @@ pollsControler.controller('PollNewCtrl', ['$scope', '$location', 'Poll', 'NewPol
         url = "http://overpass.osm.rambler.ru/cgi/interpreter?data=[out:json];node[amenity=restaurant]("+latitudeL+","+longitudeL+","+latitudeR+","+longitudeR+");out;";
         $.getJSON(url, function(json){
            for (var i = 0; i < json.elements.length; i++) {
-            osmRestaurantsJSON.push({"id":i+1 , "text":json.elements[i].tags.name , "osm-id":json.elements[i].id, "lat":json.elements[i].lat , "lon":json.elements[i].lon})
+            osmRestaurantsJSON.push({"id":i+1 , "text":json.elements[i].tags.name , "osmid":json.elements[i].id, "lat":json.elements[i].lat , "lon":json.elements[i].lon});
         }
     });
     }
@@ -150,12 +152,21 @@ pollsControler.controller('PollNewCtrl', ['$scope', '$location', 'Poll', 'NewPol
         $.getJSON(url, function(json){
            for (var i = 0; i < json.elements.length; i++) {
                 if (json.elements[i].tags.hasOwnProperty('cuisine')) {
+                    osmCategoryRestaurantsJSON.push({"id":i+1 , "name":json.elements[i].tags.name , "cuisine":json.elements[i].tags.cuisine , "osmid":json.elements[i].id, "lat":json.elements[i].lat , "lon":json.elements[i].lon});
                     if (!checkForDoubleCategory(json.elements[i].tags.cuisine)) {
-                        osmCategoryJSON.push({"id":i+1 , "text":json.elements[i].tags.cuisine , "osm-id":json.elements[i].id, "lat":json.elements[i].lat , "lon":json.elements[i].lon})
+                        osmCategoryJSON.push({"id":i+1 , "text":json.elements[i].tags.cuisine , "osmid":json.elements[i].id, "lat":json.elements[i].lat , "lon":json.elements[i].lon});
                     }
             }
         }
     });
+    }
+
+    function addCategoryRestaurants() {
+        for (var i = 0; i < osmCategoryRestaurantsJSON.length; i++) {
+            if (osmCategoryRestaurantsJSON[i].cuisine === categorySelection.text) {
+                cuisineRestaurants.push({"id":osmCategoryRestaurantsJSON[i].id , "name":osmCategoryRestaurantsJSON[i].name , "cuisine":osmCategoryRestaurantsJSON[i].cuisine , "osmid":osmCategoryRestaurantsJSON[i].osmid, "lat":osmCategoryRestaurantsJSON[i].lat , "lon":osmCategoryRestaurantsJSON[i].lon});   
+            }
+        }
     }
 
     $('#selectRestaurant').select2({
@@ -179,7 +190,7 @@ pollsControler.controller('PollNewCtrl', ['$scope', '$location', 'Poll', 'NewPol
 
     $("#selectCategory").on("change", function() {
         categorySelection = $('#selectCategory').select2('data');
-        alert(JSON.stringify(categorySelection));
+        addCategoryRestaurants();
     });
 }
 ]);
