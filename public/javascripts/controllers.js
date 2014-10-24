@@ -91,8 +91,10 @@ pollsControler.controller('PollNewCtrl', ['$scope', '$location', 'Poll', 'NewPol
         */
 
         function _checkForDoubleCategory(obj, x) {
-            for (var i = 0; i < obj.length || x == obj[i].text; i++) {
-                    return true;
+            for (var i = 0; i < obj.length; i++) {
+                    if (x === obj[i].text) {
+                        return true;
+                    }
             }
             return false;
         }
@@ -130,7 +132,10 @@ pollsControler.controller('PollNewCtrl', ['$scope', '$location', 'Poll', 'NewPol
     getLocation();
 
 
-    var osmCategoryJSON = osmRestaurantsJSON = osmCategoryRestaurantsJSON = cuisineRestaurants = [];
+    var osmCategoryJSON = [];
+    var osmRestaurantsJSON = [];
+    var osmCategoryRestaurantsJSON = [];
+    var cuisineRestaurants = [];
 
     // get openstreetmap JSON data from overpass API and save relevant data to variable osmJSON
     function initRestaurants(coords) {
@@ -170,10 +175,7 @@ pollsControler.controller('PollNewCtrl', ['$scope', '$location', 'Poll', 'NewPol
 
                     osmCategoryJSON.push({
                         "id":i+1 ,
-                        "text":json.elements[i].tags.cuisine ,
-                        "osmid":json.elements[i].id,
-                        "lat":json.elements[i].lat ,
-                        "lon":json.elements[i].lon
+                        "text":json.elements[i].tags.cuisine
                     });
                 }
             }
