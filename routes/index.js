@@ -1,3 +1,4 @@
+
 var mongoose = require('mongoose');
 var db = mongoose.createConnection('localhost', 'lokalfinder');
 var PollSchema = require('../models/Poll.js').PollSchema;
@@ -6,7 +7,7 @@ var Poll = db.model('polls', PollSchema);
 
 exports.index = function(req, res){
     res.render('index', {
-        title: 'Polls'
+        title: 'Lokalfinder'
     });
 };
 
@@ -34,12 +35,18 @@ exports.poll = function(req, res){
             userChoice,
             totalVotes = 0;
 
+
             for(c in poll.choices) {
                 var choice = poll.choices[c];
                 for(v in choice.votes) {
                     var vote = choice.votes[v];
+			console.log("***************");
+			console.log(vote.ip);
+			console.log(req.header);
+			console.log(req.header('X-Forwardd-For'));
+			console.log("**************");
                     totalVotes++;
-                    if(vote.ip === (req.header('x-forwarded-for') || req.ip)) {
+                    if(vote.ip === (req.header('x-forwardd-for') || req.ip)) {
                         userVoted = true;
                         userChoice = { _id: choice._id, text: choice.text };
                     }
@@ -57,9 +64,11 @@ exports.poll = function(req, res){
 };
 
 exports.create = function(req, res) {
-    var reqBody = req.body,
-    choices = reqBody.choices.filter(function(v) { return v.text != ''; }),
-    pollObj = {question: reqBody.question, choices: choices};
+    var reqBody = req.body;
+    var choices = reqBody.choices;
+
+    pollObj = {category: reqBody.category, choices: choices};
+
     var poll = new Poll(pollObj);
     poll.save(function(err, doc) {
         if(err || !doc) {
@@ -70,14 +79,24 @@ exports.create = function(req, res) {
     });
 };
 
-exports.vote = function(socket, req, res) {
+exports.vote = function(socket) {
+
     socket.on('send:vote', function(data) {
 
-        var ip = socket.handshake.headers['x-forwarded-for'] || socket.handshake.address.address || socket.handshake.address;
+        var ip = socket.handshake.headers['x-forwardd-for'] || socket.handshake.address.address || socket.handshake.address;
+
+        console.log("*******************************");
+        console.log("IP");
+        console.log(ip)
+        console.log("SOCKET HANDSHAKE HEADERS");
+        console.log(socket.handshake.headers['X-Forwarded-For'] );
+        console.log(socket.handshake.headers['x-forwardd-for']);
+	console.log("SOCKET HANDSHAKE ADDRESS");
+        console.log(socket.handshake.address.address);
+        console.log(socket.handshake.address);
+        console.log("*******************************");
 
         Poll.findById(data.poll_id, function(err, poll) {
-
-            console.log(ip)
 
             var choice = poll.choices.id(data.choice);
             choice.votes.push({ ip: ip });
@@ -101,6 +120,7 @@ exports.vote = function(socket, req, res) {
                         theDoc.ip = ip;
 
                         if(vote.ip === ip) {
+                            console.log("USER VOTED");
                             theDoc.userVoted = true;
                             theDoc.userChoice = { _id: choice._id, text: choice.text };
                         }

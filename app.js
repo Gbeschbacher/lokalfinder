@@ -33,6 +33,8 @@ var app = express();
     App Configurations
 **/
 
+app.enable('trust proxy');
+
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 app.use(logger('dev'));
@@ -53,6 +55,7 @@ app.use(function(req, res, next){
 app.get('/', routes.index);
 app.get('/partials/:name', routes.partials);
 app.get('/polls/:id', routes.listItem);
+app.get('/polls/:id/check', routes.poll);
 app.get('/polls', routes.list);
 app.post('/polls', routes.create);
 app.get('*', routes.index);
