@@ -1,3 +1,4 @@
+
 var mongoose = require('mongoose');
 var db = mongoose.createConnection('localhost', 'lokalfinder');
 var PollSchema = require('../models/Poll.js').PollSchema;
@@ -6,7 +7,7 @@ var Poll = db.model('polls', PollSchema);
 
 exports.index = function(req, res){
     res.render('index', {
-        title: 'Polls'
+        title: 'Lokalfinder'
     });
 };
 
@@ -63,9 +64,11 @@ exports.poll = function(req, res){
 };
 
 exports.create = function(req, res) {
-    var reqBody = req.body,
-    choices = reqBody.choices.filter(function(v) { return v.text != ''; }),
-    pollObj = {question: reqBody.question, choices: choices};
+    var reqBody = req.body;
+    var choices = reqBody.choices;
+
+    pollObj = {category: reqBody.category, choices: choices};
+
     var poll = new Poll(pollObj);
     poll.save(function(err, doc) {
         if(err || !doc) {
