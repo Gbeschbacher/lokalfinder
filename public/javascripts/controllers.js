@@ -12,8 +12,8 @@ pollsControler.controller('PollListCtrl', ['$scope', 'Poll', 'NewPollCategorySer
     }
 ]);
 
-pollsControler.controller('PollItemCtrl', ['$scope', '$routeParams', 'Poll', 'socket',
-    function ($scope, $routeParams, Poll, socket) {
+pollsControler.controller('PollItemCtrl', ['$scope', '$routeParams', 'Poll', 'socket', 'CheckVote',
+    function ($scope, $routeParams, Poll, socket, CheckVote) {
 
         Poll.get({
             _id: $routeParams.pollId
@@ -38,11 +38,25 @@ pollsControler.controller('PollItemCtrl', ['$scope', '$routeParams', 'Poll', 'so
             var pollId = $scope.poll._id,
                 choiceId = $scope.poll.userVote;
 
-            if(choiceId){
-                var voteObj = {poll_id:pollId, choice: choiceId};
-                socket.emit('send:vote', voteObj);
+            var userVoted = _checkIp(pollId);
+            if(!userVoted.userVoted){
+                if(choiceId){
+                    var voteObj = {poll_id:pollId, choice: choiceId};
+                    socket.emit('send:vote', voteObj);
+                }
+                else{
+                    // choice in frontend is missing
+                }
+            } else{
+                // userVoted = true.. so user has already a choice
+                // userVoted.userChoice = {_id, text: (choice)}
             }
         };
+
+         function _checkIp(pollId){
+            return CheckVote.query({_id: pollId});
+        };
+
     }
 ]);
 
@@ -169,7 +183,7 @@ pollsControler.controller('PollNewCtrl', ['$scope', '$location', 'Poll', 'NewPol
                     "lat":json.elements[i].lat ,
                     "lon":json.elements[i].lon
                 });
-                
+
                 // prohibit double entries to get a JSON with unique foods/cuisines
                 if (!_checkForDoubleCategory(osmCategoryJSON,json.elements[i].tags.cuisine)) {
 

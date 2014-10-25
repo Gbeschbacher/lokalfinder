@@ -29,6 +29,7 @@ exports.listItem = function(req, res){
 
 exports.poll = function(req, res){
     var pollId = req.params.id;
+    console.log(pollId);
     Poll.findById(pollId, '', { lean: true }, function(err, poll) {
         if(poll) {
             var userVoted = false,
@@ -40,11 +41,11 @@ exports.poll = function(req, res){
                 var choice = poll.choices[c];
                 for(v in choice.votes) {
                     var vote = choice.votes[v];
-			console.log("***************");
-			console.log(vote.ip);
-			console.log(req.header);
-			console.log(req.header('X-Forwardd-For'));
-			console.log("**************");
+                    console.log("***************");
+                    console.log(vote.ip);
+                    console.log(req.header);
+                    console.log(req.header('X-Forwardd-For'));
+                    console.log("**************");
                     totalVotes++;
                     if(vote.ip === (req.header('x-forwardd-for') || req.ip)) {
                         userVoted = true;
@@ -91,7 +92,7 @@ exports.vote = function(socket) {
         console.log("SOCKET HANDSHAKE HEADERS");
         console.log(socket.handshake.headers['X-Forwarded-For'] );
         console.log(socket.handshake.headers['x-forwardd-for']);
-	console.log("SOCKET HANDSHAKE ADDRESS");
+        console.log("SOCKET HANDSHAKE ADDRESS");
         console.log(socket.handshake.address.address);
         console.log(socket.handshake.address);
         console.log("*******************************");
