@@ -7,7 +7,7 @@ service.factory('CheckVote', function($resource){
     return $resource('/api/poll/:_id/check', {
         _id: '@pollId'
     },{
-    	'query': {method: 'GET', isArray:true}
+    	'query': {method: 'GET', isArray:false}
     });
 });
 

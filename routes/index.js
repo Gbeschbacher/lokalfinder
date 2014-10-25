@@ -63,9 +63,7 @@ exports.poll = function(req, res){
             poll.userVoted = userVoted;
             poll.userChoice = userChoice;
             poll.totalVotes = totalVotes;
-	    var temp = [];
-	    temp.push(poll);
-            res.json(temp);
+            res.json(poll);
         } else {
             res.json({error:true});
         }
