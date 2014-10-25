@@ -1,40 +1,15 @@
-<div class="page-header">
-    <h1>Umfragen</h1>
+<div class="context-padded">
+
 </div>
-<div class="row">
-    <div class="col-xs-5">
-        <a href="poll/create" ng-click="category=false; newPoll()" class="btn btn-default">
-            <span class="glyphicon glyphicon-plus"></span>
-            Restaurant
+<div class="content-padded, indexText">
+<h3>Lust auf dein Lieblingsessen oder Restaurant?</h1>
+<h4>Frage deine Freunde ob sie mitwollen!</h2>
+</div>
+<div class="content-padded indexImgs">
+    <a href="poll/create" ng-click="category=false; newPoll();">
+            <i class="fa fa-home fa-5x indexImg"></i>
         </a>
-        <a href="poll/create" ng-click="category=true; newPoll();" class="btn btn-default">
-            <span class="glyphicon glyphicon-plus"></span>
-            Küche
+        <a href="poll/create" ng-click="category=true; newPoll();">
+            <i class="fa fa-cutlery fa-4x indexImg"></i>
         </a>
-    </div>
-
-    <div class="col-xs-7">
-        <input type="text" class="form-control" ng-model="query" placeholder="Search for a poll">
-    </div>
 </div>
-
-<div class="row">
-    <div class="col-xs-12">
-        <hr>
-    </div>
-</div>
-
-<div class="row" ng-switch on="polls.length">
-    <ul ng-switch-when="0">
-        <li>
-            <em>Keine Umfragen in der Datenbank. Willst du eine neue <a href="poll/create">Umfrage erstellen</a>?
-        </li>
-    </ul>
-
-    <ul ng-switch-default>
-        <li ng-repeat="poll in polls | filter:query">
-            <a href="poll/{{poll._id}}">{{poll.question}}</a>
-        </li>
-    </ul>
-</div>
-<p>&nbsp;</p>
