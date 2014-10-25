@@ -38,39 +38,36 @@ pollsControler.controller('PollItemCtrl', ['$scope', '$routeParams', 'Poll', 'so
             var pollId = $scope.poll._id,
                 choiceId = $scope.poll.userVote;
 
-            var userVoted = [];
-	    userVoted = _checkIp(pollId);
-            console.log("******************");
-            console.log("CONTROLLER");
-            console.log("USERVOTED");
-            console.log(userVoted);
-	    console.log(userVoted.userVoted);
-	    console.log(!userVoted.userVoted);
-	    console.log(userVoted.category);
-	    console.log(userVoted[userVoted]);
-            console.log("******************");
+            _checkIp(pollId).$promise.then(function (data){
+                var userVoted = data;
 
-            if(!userVoted.userVoted){
-                console.log("if !useVoted.userVoted");
-                if(choiceId){
-                    console.log("userVoted");
-                    var voteObj = {poll_id:pollId, choice: choiceId};
-                    socket.emit('send:vote', voteObj);
+                console.log("******************");
+                console.log("CONTROLLER");
+                console.log("USERVOTED");
+                console.log(userVoted);
+                console.log(userVoted.userVoted);
+                console.log(!userVoted.userVoted);
+                console.log(userVoted.category);
+                console.log("******************");
+
+                if(!userVoted.userVoted){
+                    console.log("if !useVoted.userVoted");
+                    if(choiceId){
+                        console.log("userVoted");
+                        var voteObj = {poll_id:pollId, choice: choiceId};
+                        socket.emit('send:vote', voteObj);
+                    } else{
+                        // choice in frontend is missing
+                    }
+                } else{
+                    // userVoted = true.. so user has already a choice
+                    // userVoted.userChoice = {_id, text: (choice)}
                 }
-                else{
-                    // choice in frontend is missing
-                }
-            } else{
-                // userVoted = true.. so user has already a choice
-                // userVoted.userChoice = {_id, text: (choice)}
-            }
+            });
         };
 
          function _checkIp(pollId){
-            CheckVote.query({_id: pollId},
-                function (data){
-
-            });
+            return CheckVote.query({_id: pollId});
         };
 
     }
