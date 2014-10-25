@@ -11,5 +11,5 @@ polls.config(['$routeProvider', '$locationProvider',
             when('/', { templateUrl: 'partials/list.html', controller: 'PollListCtrl'}).
             when('/poll/create', { templateUrl: 'partials/new.html', controller: 'PollNewCtrl'}).
             when('/poll/:pollId', { templateUrl: 'partials/item.html', controller: 'PollItemCtrl'})
-            //.otherwise({ redirectTo: '/' });
+            .otherwise({ redirectTo: '/' });
     }]);

@@ -54,11 +54,11 @@ app.use(function(req, res, next){
 
 app.get('/', routes.index);
 app.get('/partials/:name', routes.partials);
-app.get('/poll/:id', routes.listItem);
-app.get('/poll/:id/check', routes.poll);
-app.get('/poll', routes.list); // delete route if project is finished
-app.post('/poll', routes.create);
-//app.get('*', routes.index);
+app.get('/api/poll/:id', routes.listItem);
+app.get('/api/poll/:id/check', routes.poll);
+app.get('/api/poll', routes.list); // delete route if project is finished
+app.post('/api/poll', routes.create);
+app.get('*', routes.index);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
