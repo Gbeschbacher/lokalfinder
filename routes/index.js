@@ -29,8 +29,12 @@ exports.listItem = function(req, res){
 
 exports.poll = function(req, res){
     var pollId = req.params.id;
-    console.log(pollId);
+    console.log("********************");
+    console.log("SERVER INDEX.JS");
     Poll.findById(pollId, '', { lean: true }, function(err, poll) {
+        console.log("poll");
+        console.log(poll);
+
         if(poll) {
             var userVoted = false,
             userChoice,
@@ -41,13 +45,15 @@ exports.poll = function(req, res){
                 var choice = poll.choices[c];
                 for(v in choice.votes) {
                     var vote = choice.votes[v];
-                    console.log("***************");
+                    console.log("Vote Ip");
                     console.log(vote.ip);
-                    console.log(req.header);
+                    console.log("Req.header");
                     console.log(req.header('X-Forwardd-For'));
-                    console.log("**************");
+                    console.log("Req.ip");
+                    console.log(req.ip);
                     totalVotes++;
-                    if(vote.ip === (req.header('x-forwardd-for') || req.ip)) {
+                    if(vote.ip === (req.header('X-Forwardd-For') || req.ip)) {
+                        console.log("Vote IP === req.header or req.ip")
                         userVoted = true;
                         userChoice = { _id: choice._id, text: choice.text };
                     }
@@ -87,10 +93,10 @@ exports.vote = function(socket) {
         var ip = socket.handshake.headers['x-forwardd-for'] || socket.handshake.address.address || socket.handshake.address;
 
         console.log("*******************************");
+        console.log("SOCKET VOTE");
         console.log("IP");
         console.log(ip)
         console.log("SOCKET HANDSHAKE HEADERS");
-        console.log(socket.handshake.headers['X-Forwarded-For'] );
         console.log(socket.handshake.headers['x-forwardd-for']);
         console.log("SOCKET HANDSHAKE ADDRESS");
         console.log(socket.handshake.address.address);

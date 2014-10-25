@@ -39,8 +39,16 @@ pollsControler.controller('PollItemCtrl', ['$scope', '$routeParams', 'Poll', 'so
                 choiceId = $scope.poll.userVote;
 
             var userVoted = _checkIp(pollId);
+            console.log("******************");
+            console.log("CONTROLLER");
+            console.log("USERVOTED");
+            console.log(userVoted);
+            console.log("******************");
+
             if(!userVoted.userVoted){
+                console.log("if !useVoted.userVoted");
                 if(choiceId){
+                    console.log("userVoted");
                     var voteObj = {poll_id:pollId, choice: choiceId};
                     socket.emit('send:vote', voteObj);
                 }
