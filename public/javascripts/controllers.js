@@ -62,7 +62,10 @@ pollsControler.controller('PollItemCtrl', ['$scope', '$routeParams', 'Poll', 'so
         };
 
          function _checkIp(pollId){
-            return CheckVote.query({_id: pollId});
+            CheckVote.query({_id: pollId},
+                function (data){
+
+            });
         };
 
     }
