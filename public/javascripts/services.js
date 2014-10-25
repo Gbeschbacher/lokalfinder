@@ -6,8 +6,8 @@ service.factory('Poll', function($resource){
 service.factory('CheckVote', function($resource){
     return $resource('/api/poll/:_id/check', {
         _id: '@pollId'
-    }, {
-      'query': {method:'GET', isArray:false}
+    },{
+    	'query': {method: 'GET', isArray:true}
     });
 });
 

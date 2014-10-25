@@ -38,11 +38,16 @@ pollsControler.controller('PollItemCtrl', ['$scope', '$routeParams', 'Poll', 'so
             var pollId = $scope.poll._id,
                 choiceId = $scope.poll.userVote;
 
-            var userVoted = _checkIp(pollId);
+            var userVoted = [];
+	    userVoted = _checkIp(pollId);
             console.log("******************");
             console.log("CONTROLLER");
             console.log("USERVOTED");
             console.log(userVoted);
+	    console.log(userVoted.userVoted);
+	    console.log(!userVoted.userVoted);
+	    console.log(userVoted.category);
+	    console.log(userVoted[userVoted]);
             console.log("******************");
 
             if(!userVoted.userVoted){
