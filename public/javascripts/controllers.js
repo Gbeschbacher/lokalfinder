@@ -19,7 +19,17 @@ pollsControler.controller('PollItemCtrl', ['$scope', '$routeParams', 'Poll', 'so
             _id: $routeParams.pollId
         }, function(data){
             $scope.poll = data;
+            _checkIp($scope.poll._id).$promise.then(function (data){
+                var userVoted = data;
+
+                if(userVoted.userVoted){
+                        var obj = {poll_id: $scope.poll._id, choice: userVoted.userChoice};
+                        socket.emit('send:display', obj);
+                }
+            });
         });
+
+
 
         socket.on('myvote', function(data){
             if(data._id === $routeParams.pollId){
@@ -57,8 +67,9 @@ pollsControler.controller('PollItemCtrl', ['$scope', '$routeParams', 'Poll', 'so
                 } else{
                     // userVoted = true.. so user has already a choice
                     // userVoted.userChoice = {_id, text: (choice)}
-                    var obj = {poll_id: pollId, choice: userVoted.userChoice};
-                    socket.emit('send:display', obj)
+                    // console.log("vote function")
+                    // var obj = {poll_id: pollId, choice: userVoted.userChoice};
+                    // socket.emit('send:display', obj)
                 }
             });
         };

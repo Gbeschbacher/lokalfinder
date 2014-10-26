@@ -122,15 +122,15 @@ exports.vote = function(socket) {
         Poll.findById(data.poll_id, function(err, poll){
 
             var obj = {
-                _id: poll._id
+                _id: poll._id,
                 choices: poll.choices,
-                choice: data.choice,
+                userChoice: data.choice,
                 totalVotes: 0,
-
+                userVoted: true
             };
 
             for(var i=0, ln = obj.choices.length; i<ln; i++){
-                for(var j=0, jLn = obj.choices[i],votes.length; j < jLn; j++){
+                for(var j=0, jLn = obj.choices[i].votes.length; j < jLn; j++){
                     obj.totalVotes++;
                 }
             }
