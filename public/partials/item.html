@@ -1,35 +1,20 @@
 <div class="item">
 
-<div class="well well-lg">
     <strong>Question</strong>
     <br>
     {{poll.question}}
-</div>
 
 <div ng-hide="poll.userVoted">
     <p class="lead">Bitte wähle eine der folgenden Optionen aus.</p>
     <form role="form" ng-submit="vote()">
-
-        <div ng-repeat="choice in poll.choices" class="radio">
-            <label>
-                <input type="radio" name="choice" ng-model="poll.userVote"
-                value="{{choice._id}}">
-                {{choice.text}}
-            </label>
-        </div>
-
-        <p><hr></p>
-
-        <div class="row">
-            <div class="col-xs-6">
-                <a href="/" class="btn btn-default" role="button">
-                    <span class="glyphicon glyphicon-arrow-left"></span> Zurück zur Umfrage</a>
-            </div>
-
-            <div class="col-xs-6">
-                <button class="btn btn-primary pull-right" type="submit"> Vote &raquo;</button>
-            </div>
-        </div>
+        <table class="itemChoices">
+        <tr ng-repeat="choice in poll.choices" class="radio">
+                <td>
+                <input type="radio" name="choice" ng-model="poll.userVote" value="{{choice._id}}" id="{{choice._id}}"></td>
+                <td><label for="{{choice._id}}">&nbsp;{{choice.text}}</label></td>
+            </label></tr>
+        </table>
+                <button class="btn btn-primary" type="submit"> Vote </button>
     </form>
 </div>
 
@@ -39,7 +24,7 @@
             <tr ng-repeat="choice in poll.choices">
                 <td>{{choice.text}}</td>
                 <td>
-                  <table style="width: {{choice.votes.length/poll.totalVotes*100}}%;">
+                  <table style="width: {{choice.votes.length/poll.totalVotes*80}}%;">
                     <tr>
                         <td>{{choice.votes.length}}</td>
                     </tr>
@@ -48,21 +33,9 @@
             </tr>
         </tbody>
     </table>
-
-    <p>
-        <em>{{poll.totalVotes}} Votes wurden bisher gezählt. <span
-        ng-show="poll.userChoice">
+    <p class="votedForText">
+        {{poll.totalVotes}} Votes wurden bisher gezählt.
             du hast dich entschieden für: <strong>{{poll.userChoice.text}}</strong>
-            .</span>
-        </em>
-    </p>
-
-    <p><hr></p>
-
-    <p>
-        <a href="polls" class="btn" role="button">
-            <span class="icon icon-left"></span>
-            Zurück zur Übersicht</a>
     </p>
 </div>
 </div>

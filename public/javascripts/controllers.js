@@ -100,11 +100,9 @@ pollsControler.controller('PollNewCtrl', ['$scope', '$location', 'Poll', 'NewPol
                     {text: "Keine Lust"},
                 ]
            }else if (typeof $scope.categorySelection != 'undefined'){
-
             /*
-            write all available restaurants from the chosen category to var
-                $scope.poll.choices = [{], {}, {}]
-            */
+            write all available restaurants from the chosen category to var*/
+                $scope.poll.choices = cuisineRestaurants;
            }else {
                 console.log("THIS SHOULD NEVER EVER HAPPEN");
            }
@@ -222,7 +220,7 @@ pollsControler.controller('PollNewCtrl', ['$scope', '$location', 'Poll', 'NewPol
             if (osmCategoryRestaurantsJSON[i].cuisine === $scope.categorySelection.text) {
                 cuisineRestaurants.push({
                     "id":osmCategoryRestaurantsJSON[i].id ,
-                    "name":osmCategoryRestaurantsJSON[i].name ,
+                    "text":osmCategoryRestaurantsJSON[i].name ,
                     "cuisine":osmCategoryRestaurantsJSON[i].cuisine ,
                     "osmid":osmCategoryRestaurantsJSON[i].osmid,
                     "lat":osmCategoryRestaurantsJSON[i].lat ,
