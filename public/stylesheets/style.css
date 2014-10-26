@@ -29,9 +29,12 @@ body {
   background-position: center top;
   z-index: 1
 }
+.index {
+  position: relative;
+  text-align: center;
+  top: 25%;
+}
 .indexText {
-	padding-top: 10%;
-	text-align: center;
 	text-shadow: 1px 1px 1px #ccc;
 }
 .indexImg {
@@ -39,10 +42,16 @@ body {
 	text-shadow: 1px 1px 1px #ccc;
 	padding: 15px;
 }
-.indexImgs {
-	text-align: center;
-	padding-top: 50px;
+.newControlls {
+  position: relative;
+  padding-top: 100px;
 }
-.sliderImg {
-	height: 200px;
+.new {
+  position: relative;
+  text-align: center;
+  top: 25%;
+}
+.item {
+  position: relative;
+  top: 25%;
 }
