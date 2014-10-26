@@ -33,9 +33,18 @@
             </tr>
         </tbody>
     </table>
+
+    <nvd3
+        options="chartOptions"
+        data="chartData"
+        api="api"
+        config="chartConfig"
+        ></nvd3>
+
     <p class="votedForText">
         {{poll.totalVotes}} Votes wurden bisher gezählt.
-            du hast dich entschieden für: <strong>{{poll.userChoice.text}}</strong>
+        <span ng-show="poll.userChoice"> Du hast dich entschieden für: <strong>{{poll.userChoice.text}}</strong>
+            </span>
     </p>
 </div>
 </div>
