@@ -32,7 +32,13 @@ pollsControler.controller('PollItemCtrl', ['$scope', '$routeParams', 'Poll', 'so
                 $scope.poll.choices = data.choices;
                 $scope.poll.totalVotes = data.totalVotes;
             }
-        })
+        });
+
+        socket.on('updateView', function(data){
+            if(data._id === $routeParams.pollId){
+                $scope.poll = data
+            }
+        });
 
         $scope.vote = function() {
             var pollId = $scope.poll._id,
@@ -41,19 +47,8 @@ pollsControler.controller('PollItemCtrl', ['$scope', '$routeParams', 'Poll', 'so
             _checkIp(pollId).$promise.then(function (data){
                 var userVoted = data;
 
-                console.log("******************");
-                console.log("CONTROLLER");
-                console.log("USERVOTED");
-                console.log(userVoted);
-                console.log(userVoted.userVoted);
-                console.log(!userVoted.userVoted);
-                console.log(userVoted.category);
-                console.log("******************");
-
                 if(!userVoted.userVoted){
-                    console.log("if !useVoted.userVoted");
                     if(choiceId){
-                        console.log("userVoted");
                         var voteObj = {poll_id:pollId, choice: choiceId};
                         socket.emit('send:vote', voteObj);
                     } else{
@@ -62,6 +57,8 @@ pollsControler.controller('PollItemCtrl', ['$scope', '$routeParams', 'Poll', 'so
                 } else{
                     // userVoted = true.. so user has already a choice
                     // userVoted.userChoice = {_id, text: (choice)}
+                    var obj = {poll_id: pollId, choice: userVoted.userChoice};
+                    socket.emit('send:display', obj)
                 }
             });
         };

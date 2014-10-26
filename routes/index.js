@@ -29,11 +29,7 @@ exports.listItem = function(req, res){
 
 exports.poll = function(req, res){
     var pollId = req.params.id;
-    console.log("********************");
-    console.log("SERVER INDEX.JS");
     Poll.findById(pollId, '', { lean: true }, function(err, poll) {
-        console.log("poll");
-        console.log(poll);
 
         if(poll) {
             var userVoted = false,
@@ -45,15 +41,8 @@ exports.poll = function(req, res){
                 var choice = poll.choices[c];
                 for(v in choice.votes) {
                     var vote = choice.votes[v];
-                    console.log("Vote Ip");
-                    console.log(vote.ip);
-                    console.log("Req.header");
-                    console.log(req.header('X-Forwardd-For'));
-                    console.log("Req.ip");
-                    console.log(req.ip);
                     totalVotes++;
                     if(vote.ip === (req.header('X-Forwardd-For') || req.ip)) {
-                        console.log("Vote IP === req.header or req.ip")
                         userVoted = true;
                         userChoice = { _id: choice._id, text: choice.text };
                     }
@@ -92,17 +81,6 @@ exports.vote = function(socket) {
 
         var ip = socket.handshake.headers['x-forwardd-for'] || socket.handshake.address.address || socket.handshake.address;
 
-        console.log("*******************************");
-        console.log("SOCKET VOTE");
-        console.log("IP");
-        console.log(ip)
-        console.log("SOCKET HANDSHAKE HEADERS");
-        console.log(socket.handshake.headers['x-forwardd-for']);
-        console.log("SOCKET HANDSHAKE ADDRESS");
-        console.log(socket.handshake.address.address);
-        console.log(socket.handshake.address);
-        console.log("*******************************");
-
         Poll.findById(data.poll_id, function(err, poll) {
 
             var choice = poll.choices.id(data.choice);
@@ -113,7 +91,7 @@ exports.vote = function(socket) {
                 var theDoc = {
                      _id: doc._id,
                     question: doc.question,
-                     choices: doc.choices,
+                    choices: doc.choices,
                     userVoted: false,
                     totalVotes: 0
                 };
@@ -127,7 +105,6 @@ exports.vote = function(socket) {
                         theDoc.ip = ip;
 
                         if(vote.ip === ip) {
-                            console.log("USER VOTED");
                             theDoc.userVoted = true;
                             theDoc.userChoice = { _id: choice._id, text: choice.text };
                         }
@@ -139,4 +116,28 @@ exports.vote = function(socket) {
             });
         });
     });
+
+
+    socket.on('send:display', function (data){
+        Poll.findById(data.poll_id, function(err, poll){
+
+            var obj = {
+                _id: poll._id
+                choices: poll.choices,
+                choice: data.choice,
+                totalVotes: 0,
+
+            };
+
+            for(var i=0, ln = obj.choices.length; i<ln; i++){
+                for(var j=0, jLn = obj.choices[i],votes.length; j < jLn; j++){
+                    obj.totalVotes++;
+                }
+            }
+
+            socket.emit('updateView', obj);
+
+        });
+    });
+
 };
