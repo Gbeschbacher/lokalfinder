@@ -12,8 +12,8 @@ pollsControler.controller('PollListCtrl', ['$scope', 'Poll', 'NewPollCategorySer
     }
 ]);
 
-pollsControler.controller('PollItemCtrl', ['$scope', '$routeParams', 'Poll', 'socket',
-    function ($scope, $routeParams, Poll, socket) {
+pollsControler.controller('PollItemCtrl', ['$scope', '$routeParams', 'Poll', 'socket', 'CheckVote',
+    function ($scope, $routeParams, Poll, socket, CheckVote) {
 
         Poll.get({
             _id: $routeParams.pollId
@@ -38,11 +38,38 @@ pollsControler.controller('PollItemCtrl', ['$scope', '$routeParams', 'Poll', 'so
             var pollId = $scope.poll._id,
                 choiceId = $scope.poll.userVote;
 
-            if(choiceId){
-                var voteObj = {poll_id:pollId, choice: choiceId};
-                socket.emit('send:vote', voteObj);
-            }
+            _checkIp(pollId).$promise.then(function (data){
+                var userVoted = data;
+
+                console.log("******************");
+                console.log("CONTROLLER");
+                console.log("USERVOTED");
+                console.log(userVoted);
+                console.log(userVoted.userVoted);
+                console.log(!userVoted.userVoted);
+                console.log(userVoted.category);
+                console.log("******************");
+
+                if(!userVoted.userVoted){
+                    console.log("if !useVoted.userVoted");
+                    if(choiceId){
+                        console.log("userVoted");
+                        var voteObj = {poll_id:pollId, choice: choiceId};
+                        socket.emit('send:vote', voteObj);
+                    } else{
+                        // choice in frontend is missing
+                    }
+                } else{
+                    // userVoted = true.. so user has already a choice
+                    // userVoted.userChoice = {_id, text: (choice)}
+                }
+            });
         };
+
+         function _checkIp(pollId){
+            return CheckVote.query({_id: pollId});
+        };
+
     }
 ]);
 
@@ -91,8 +118,10 @@ pollsControler.controller('PollNewCtrl', ['$scope', '$location', 'Poll', 'NewPol
         */
 
         function _checkForDoubleCategory(obj, x) {
-            for (var i = 0; i < obj.length || x == obj[i].text; i++) {
-                    return true;
+            for (var i = 0; i < obj.length; i++) {
+                    if (x === obj[i].text) {
+                        return true;
+                    }
             }
             return false;
         }
@@ -106,7 +135,7 @@ pollsControler.controller('PollNewCtrl', ['$scope', '$location', 'Poll', 'NewPol
         };
 
      function showPosition(position) {
-        var range = 10.05,
+        var range = 0.05,
             latitude = parseFloat(position.coords.latitude).toFixed(2),
             longitude = parseFloat(position.coords.longitude).toFixed(2);
 
@@ -130,7 +159,10 @@ pollsControler.controller('PollNewCtrl', ['$scope', '$location', 'Poll', 'NewPol
     getLocation();
 
 
-    var osmCategoryJSON = osmRestaurantsJSON = osmCategoryRestaurantsJSON = cuisineRestaurants = [];
+    var osmCategoryJSON = [];
+    var osmRestaurantsJSON = [];
+    var osmCategoryRestaurantsJSON = [];
+    var cuisineRestaurants = [];
 
     // get openstreetmap JSON data from overpass API and save relevant data to variable osmJSON
     function initRestaurants(coords) {
@@ -154,29 +186,25 @@ pollsControler.controller('PollNewCtrl', ['$scope', '$location', 'Poll', 'NewPol
     function initCategories(coords) {
         var url = "http://overpass.osm.rambler.ru/cgi/interpreter?data=[out:json];node[amenity=restaurant][cuisine]("+coords.latitudeL+","+coords.longitudeL+","+coords.latitudeR+","+coords.longitudeR+");out;";
 
-
         $.getJSON(url, function(json){
-
             for (var i = 0; i < json.elements.length; i++) {
-                    if (!_checkForDoubleCategory(osmCategoryJSON,json.elements[i].tags.cuisine)) {
+                osmCategoryRestaurantsJSON.push({
+                    "id":i+1 ,
+                    "name":json.elements[i].tags.name ,
+                    "cuisine":json.elements[i].tags.cuisine ,
+                    "osmid":json.elements[i].id,
+                    "lat":json.elements[i].lat ,
+                    "lon":json.elements[i].lon
+                });
 
-                        osmCategoryJSON.push({
-                            "id":i+1 ,
-                            "text":json.elements[i].tags.cuisine ,
-                            "osmid":json.elements[i].id,
-                            "lat":json.elements[i].lat ,
-                            "lon":json.elements[i].lon
-                        });
-                    }
+                // prohibit double entries to get a JSON with unique foods/cuisines
+                if (!_checkForDoubleCategory(osmCategoryJSON,json.elements[i].tags.cuisine)) {
 
-                    osmCategoryRestaurantsJSON.push({
+                    osmCategoryJSON.push({
                         "id":i+1 ,
-                        "name":json.elements[i].tags.name ,
-                        "cuisine":json.elements[i].tags.cuisine ,
-                        "osmid":json.elements[i].id,
-                        "lat":json.elements[i].lat ,
-                        "lon":json.elements[i].lon
+                        "text":json.elements[i].tags.cuisine
                     });
+                }
             }
         });
     }
