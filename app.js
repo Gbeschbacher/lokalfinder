@@ -33,6 +33,8 @@ var app = express();
     App Configurations
 **/
 
+app.enable('trust proxy');
+
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 app.use(logger('dev'));
@@ -52,9 +54,10 @@ app.use(function(req, res, next){
 
 app.get('/', routes.index);
 app.get('/partials/:name', routes.partials);
-app.get('/polls/:id', routes.listItem);
-app.get('/polls', routes.list);
-app.post('/polls', routes.create);
+app.get('/api/poll/:id', routes.listItem);
+app.get('/api/poll/:id/check', routes.poll);
+app.get('/api/poll', routes.list); // delete route if project is finished
+app.post('/api/poll', routes.create);
 app.get('*', routes.index);
 
 // catch 404 and forward to error handler

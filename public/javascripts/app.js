@@ -10,6 +10,6 @@ polls.config(['$routeProvider', '$locationProvider',
         $routeProvider.
             when('/', { templateUrl: 'partials/list.html', controller: 'PollListCtrl'}).
             when('/poll/create', { templateUrl: 'partials/new.html', controller: 'PollNewCtrl'}).
-            when('/poll/:pollId', { templateUrl: 'partials/item.html', controller: 'PollItemCtrl'}).
-            otherwise({ redirectTo: '/' });
+            when('/poll/:pollId', { templateUrl: 'partials/item.html', controller: 'PollItemCtrl'})
+            .otherwise({ redirectTo: '/' });
     }]);

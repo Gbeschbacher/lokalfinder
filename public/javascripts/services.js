@@ -1,7 +1,14 @@
 var service = angular.module('pollServices',['ngResource']);
 
 service.factory('Poll', function($resource){
-    return $resource('/polls/:_id');
+    return $resource('/api/poll/:_id');
+});
+service.factory('CheckVote', function($resource){
+    return $resource('/api/poll/:_id/check', {
+        _id: '@pollId'
+    },{
+    	'query': {method: 'GET', isArray:false}
+    });
 });
 
 service.factory('socket', function ($rootScope) {
