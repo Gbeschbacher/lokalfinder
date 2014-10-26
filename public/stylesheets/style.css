@@ -44,7 +44,7 @@ body {
 }
 .newControlls {
   position: relative;
-  padding-top: 100px;
+  padding-top: 50px;
 }
 .new {
   position: relative;
@@ -53,5 +53,14 @@ body {
 }
 .item {
   position: relative;
+  text-align: center;
   top: 25%;
+}
+.itemChoices {
+  margin-left:auto; 
+  margin-right:auto;
+  text-align: left;
+}
+.votedForText {
+  color: black;
 }
