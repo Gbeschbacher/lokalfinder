@@ -15,10 +15,41 @@ pollsControler.controller('PollListCtrl', ['$scope', 'Poll', 'NewPollCategorySer
 pollsControler.controller('PollItemCtrl', ['$scope', '$routeParams', 'Poll', 'socket', 'CheckVote',
     function ($scope, $routeParams, Poll, socket, CheckVote) {
 
+        $scope.chartData = [];
+        $scope.chartOptions = {
+            chart: {
+                type: 'pieChart',
+                height: 500,
+                x: function(d){return d.key;},
+                y: function(d){return d.y;},
+                showLabels: true,
+                labelThreshold: 0.01,
+            }
+        };
+
+        $scope.chartConfig = {
+            visible: true, // default: true
+            extended: false, // default: false
+            disabled: false, // default: false
+            autorefresh: true, // default: true
+            refreshDataOnly: true // default: false
+        };
+
         Poll.get({
             _id: $routeParams.pollId
         }, function(data){
             $scope.poll = data;
+
+            for(var i=0; i < $scope.poll.choices.length; i++){
+                var obj = {
+                    key: $scope.poll.choices[i].text,
+                    y: $scope.poll.choices[i].votes.length
+                };
+                $scope.chartData.push(obj);
+            }
+
+            $scope.api.refresh();
+
             _checkIp($scope.poll._id).$promise.then(function (data){
                 var userVoted = data;
 
@@ -29,11 +60,10 @@ pollsControler.controller('PollItemCtrl', ['$scope', '$routeParams', 'Poll', 'so
             });
         });
 
-
-
         socket.on('myvote', function(data){
             if(data._id === $routeParams.pollId){
                 $scope.poll = data;
+                _updateChart();
             }
         });
 
@@ -41,12 +71,6 @@ pollsControler.controller('PollItemCtrl', ['$scope', '$routeParams', 'Poll', 'so
             if(data._id === $routeParams.pollId){
                 $scope.poll.choices = data.choices;
                 $scope.poll.totalVotes = data.totalVotes;
-            }
-        });
-
-        socket.on('updateView', function(data){
-            if(data._id === $routeParams.pollId){
-                $scope.poll = data
             }
         });
 
@@ -64,12 +88,6 @@ pollsControler.controller('PollItemCtrl', ['$scope', '$routeParams', 'Poll', 'so
                     } else{
                         // choice in frontend is missing
                     }
-                } else{
-                    // userVoted = true.. so user has already a choice
-                    // userVoted.userChoice = {_id, text: (choice)}
-                    // console.log("vote function")
-                    // var obj = {poll_id: pollId, choice: userVoted.userChoice};
-                    // socket.emit('send:display', obj)
                 }
             });
         };
@@ -77,6 +95,19 @@ pollsControler.controller('PollItemCtrl', ['$scope', '$routeParams', 'Poll', 'so
          function _checkIp(pollId){
             return CheckVote.query({_id: pollId});
         };
+
+        function _updateChart(){
+            var data = [];
+            for(var i=0; i < $scope.poll.choices.length; i++){
+                var obj = {
+                    key: $scope.poll.choices[i].text,
+                    y: $scope.poll.choices[i].votes.length
+                };
+                data.push(obj);
+            }
+            $scope.chartData = data;
+            $scope.api.refresh();
+        }
 
     }
 ]);
@@ -96,17 +127,20 @@ pollsControler.controller('PollNewCtrl', ['$scope', '$location', 'Poll', 'NewPol
            if(typeof $scope.restaurantSelection != 'undefined'){
                 $scope.poll.choices = [
                     {text: "Ja"},
-                    {text: "Nein"},
-                    {text: "Keine Lust"},
+                    {text: "Nein"}
                 ]
            }else if (typeof $scope.categorySelection != 'undefined'){
+                /*
+                write all available restaurants from the chosen category to var
+                    $scope.poll.choices = [{}, {}, {}]
+                */
 
-            /*
-            write all available restaurants from the chosen category to var
-                $scope.poll.choices = [{], {}, {}]
-            */
+                $scope.poll.choices = cuisineRestaurants;
+
            }else {
-                console.log("THIS SHOULD NEVER EVER HAPPEN");
+                /*
+
+                */
            }
 
             var newPoll = new Poll($scope.poll);

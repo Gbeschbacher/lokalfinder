@@ -49,6 +49,25 @@
         </tbody>
     </table>
 
+<!--     <nvd3-pie-chart
+        data="chartData"
+        id="exampleId"
+        width="550"
+        height="350"
+        x="xFunction()"
+        y="yFunction()"
+        showLabels="true"
+        pieLabelsOutside="false"
+        >
+        <svg height="250"></svg>
+    </nvd3-pie-chart> -->
+    <nvd3
+        options="chartOptions"
+        data="chartData"
+        api="api"
+        config="chartConfig"
+        ></nvd3>
+
     <p>
         <em>{{poll.totalVotes}} Votes wurden bisher gezählt. <span
         ng-show="poll.userChoice">

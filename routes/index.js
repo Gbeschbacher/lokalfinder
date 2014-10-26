@@ -135,7 +135,7 @@ exports.vote = function(socket) {
                 }
             }
 
-            socket.emit('updateView', obj);
+            socket.emit('myvote', obj);
 
         });
     });
