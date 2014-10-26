@@ -1,32 +1,25 @@
-<div class="page-header">
-    <h1>Frage deine Freunde</h1>
-</div>
-
-<form role="form" ng-submit="createPoll()">
+<form class="new" role="form" ng-submit="createPoll()">
+<div class="content-padded newQuestion">
     <div ng-show="!category">
-    <div class="form-group">
-        <label for="selectRestaurant">Habt ihr Lust auf einen Besuch im Restaurant...</label>
-        <input id="selectRestaurant"></input><label for="selectRestaurant">?</label>
-    </div>
+        <div class="form-group">
+            <h4><label for="selectRestaurant">Habt ihr Lust auf einen Besuch im Restaurant...</label>
+            <input id="selectRestaurant"></input><label for="selectRestaurant">?</label></h4>
+        </div>
     </div>
     <div ng-show="category">
-    <div class="form-group">
-        <label for="selectCategory">Ich habe Lust auf...</label>
-        <input id="selectCategory"></input>
+        <div class="form-group">
+            <label for="selectCategory"><h4>Ich habe Lust auf...</h4></label>
+            <input id="selectCategory"></input>
+        </div>
     </div>
 </div>
-<p><hr></p>
-<div class="row">
-    <div class="col-xs-6">
-        <a href="/" class="btn btn-default" role="button">
-            <span class="glyphicon glyphicon-arrow-left"></span>
+<div class="newControlls">
+        <a href="polls" class="btn" role="button">
+            <span class="icon icon-left"></span>
             Zurück zur Übersicht</a>
-        </div>
-        <div class="col-xs-6">
-            <button class="btn btn-primary pull-right" type="submit" ng-click=
+
+            <button class="btn btn-positive" type="submit" ng-click=
             "createQuestion()">
-                Erstelle eine Umfrage &raquo;</button>
-            </div>
-        </div>
-        <p>&nbsp;</p>
-    </form>
+                Erstelle eine Umfrage</button>
+                </div>
+</form>

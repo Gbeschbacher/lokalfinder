@@ -228,7 +228,7 @@ pollsControler.controller('PollNewCtrl', ['$scope', '$location', 'Poll', 'NewPol
         data: osmRestaurantsJSON,
         placeholder: "Wähle ein Restaurant...",
         multiple: false,
-        width: "200px"
+        width: "270px"
     });
 
 
@@ -236,7 +236,7 @@ pollsControler.controller('PollNewCtrl', ['$scope', '$location', 'Poll', 'NewPol
         data: osmCategoryJSON,
         placeholder: "Wähle eine Küche...",
         multiple: false,
-        width: "200px"
+        width: "270px"
     });
 
     $("#selectRestaurant").on("change", function() {

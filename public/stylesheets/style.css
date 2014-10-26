@@ -17,3 +17,41 @@ body {
     background-color: lightblue;
     text-align: right;
 }
+.content {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  background-image: url("../imgs/mushrooms.jpg");
+  background-position: center top;
+  z-index: 1
+}
+.index {
+  position: relative;
+  text-align: center;
+  top: 25%;
+}
+.indexText {
+	text-shadow: 1px 1px 1px #ccc;
+}
+.indexImg {
+	color: black;
+	text-shadow: 1px 1px 1px #ccc;
+	padding: 15px;
+}
+.newControlls {
+  position: relative;
+  padding-top: 100px;
+}
+.new {
+  position: relative;
+  text-align: center;
+  top: 25%;
+}
+.item {
+  position: relative;
+  top: 25%;
+}

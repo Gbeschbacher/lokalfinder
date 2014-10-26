@@ -1,9 +1,7 @@
 extends layout
 
 block content
-    nav.navbar.navbar-inverse.navbar-fixed-top(role='navigation')
-        div.navbar-header
-            a.navbar-brand(href='/')=title
+    header.bar.bar-nav
+       h1.title(href='/')=title
 
-    div.container
-        div(ng-view)
+    div.content(ng-view)
