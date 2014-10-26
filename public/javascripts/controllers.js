@@ -14,42 +14,33 @@ pollsControler.controller('PollListCtrl', ['$scope', 'Poll', 'NewPollCategorySer
 
 pollsControler.controller('PollItemCtrl', ['$scope', '$routeParams', 'Poll', 'socket', 'CheckVote',
     function ($scope, $routeParams, Poll, socket, CheckVote) {
-
         $scope.chartData = [];
         $scope.chartOptions = {
             chart: {
                 type: 'pieChart',
-                height: 500,
+                height: 300,
                 x: function(d){return d.key;},
                 y: function(d){return d.y;},
                 showLabels: true,
+                transitionDuration: 500,
                 labelThreshold: 0.01,
+                "showLegend": false,
+                "tooltips": false,
             }
         };
 
         $scope.chartConfig = {
-            visible: true, // default: true
-            extended: false, // default: false
-            disabled: false, // default: false
-            autorefresh: true, // default: true
-            refreshDataOnly: true // default: false
+            visible: true,
+            extended: true,
+            disabled: false,
+            autorefresh: true,
+            refreshDataOnly: false
         };
 
         Poll.get({
             _id: $routeParams.pollId
         }, function(data){
             $scope.poll = data;
-
-            for(var i=0; i < $scope.poll.choices.length; i++){
-                var obj = {
-                    key: $scope.poll.choices[i].text,
-                    y: $scope.poll.choices[i].votes.length
-                };
-                $scope.chartData.push(obj);
-            }
-
-            $scope.api.refresh();
-
             _checkIp($scope.poll._id).$promise.then(function (data){
                 var userVoted = data;
 
@@ -57,6 +48,10 @@ pollsControler.controller('PollItemCtrl', ['$scope', '$routeParams', 'Poll', 'so
                         var obj = {poll_id: $scope.poll._id, choice: userVoted.userChoice};
                         socket.emit('send:display', obj);
                 }
+
+                _updateChart();
+                setTimeout(_updateChart, 350);
+
             });
         });
 
@@ -71,6 +66,7 @@ pollsControler.controller('PollItemCtrl', ['$scope', '$routeParams', 'Poll', 'so
             if(data._id === $routeParams.pollId){
                 $scope.poll.choices = data.choices;
                 $scope.poll.totalVotes = data.totalVotes;
+                _updateChart();
             }
         });
 
@@ -96,12 +92,12 @@ pollsControler.controller('PollItemCtrl', ['$scope', '$routeParams', 'Poll', 'so
             return CheckVote.query({_id: pollId});
         };
 
-        function _updateChart(){
+        function _updateChart (){
             var data = [];
             for(var i=0; i < $scope.poll.choices.length; i++){
                 var obj = {
                     key: $scope.poll.choices[i].text,
-                    y: $scope.poll.choices[i].votes.length
+                    y: $scope.poll.choices[i].votes.length + Math.random()
                 };
                 data.push(obj);
             }
