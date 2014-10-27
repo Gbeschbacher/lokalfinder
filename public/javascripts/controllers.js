@@ -30,7 +30,7 @@ pollsControler.controller('PollItemCtrl', ['$scope', '$routeParams', 'Poll', 'so
         };
 
         $scope.chartConfig = {
-            visible: true,
+            visible: false,
             extended: true,
             disabled: false,
             autorefresh: true,
