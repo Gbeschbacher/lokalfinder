@@ -12,7 +12,7 @@ exports.index = function(req, res){
 };
 
 exports.partials = function(req, res){
-    res.render('partials/' + req.params.name + '.html');
+    res.render('partials/' + req.params.name);
 };
 
 exports.list = function(req, res){

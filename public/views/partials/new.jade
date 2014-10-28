@@ -1,0 +1,16 @@
+form.new(role='form', ng-submit='createPoll()')
+  div.content-padded.newQuestion
+    div(ng-show='!category')
+      div.form-group
+        h4
+          label(for='selectRestaurant') Habt ihr Lust auf einen Besuch im Restaurant...
+          input#selectRestaurant
+          label(for='selectRestaurant') ?
+    div(ng-show='category')
+      div.form-group
+        label(for='selectCategory')
+          h4 Ich habe Lust auf...
+        input#selectCategory
+  div.newControlls
+    button.btn.btn-positive(type='submit', ng-click='createQuestion()')
+      | Erstelle eine Umfrage

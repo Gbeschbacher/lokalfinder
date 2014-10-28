@@ -1,0 +1,16 @@
+
+div.grid
+    div.row
+        div.span12
+            h1 Lust auf dein Lieblingsessen oder Restaurant?
+            h2 Frage deine Freunde ob sie mitwollen!
+
+            div.content-padded.indexImgs
+                a(href='poll/create', ng-click='category=false; newPoll();')
+                    i.fa.fa-home.fa-5x.indexImg
+                a(href='poll/create', ng-click='category=true; newPoll();')
+                    i.fa.fa-cutlery.fa-4x.indexImg
+
+
+
+img#bg(src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" style="position: fixed; left: 0; top: 0" background-directive)
