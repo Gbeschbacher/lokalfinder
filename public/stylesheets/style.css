@@ -75,3 +75,8 @@ html, body {
 .background{
     background-color: rgba(255, 255, 255, 0.9) !important;
 }
+
+.row{
+    margin-left: 0px !important;
+    margin-right: 0px !important;
+}
