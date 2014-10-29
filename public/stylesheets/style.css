@@ -1,5 +1,5 @@
-body {
-    padding-top: 50px;
+html, body {
+    overflow-x: hidden;
 }
 
 .result-table {
@@ -17,50 +17,37 @@ body {
     background-color: lightblue;
     text-align: right;
 }
-/*.content {
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  overflow: auto;
-  -webkit-overflow-scrolling: touch;
-  background-image: url("../imgs/mushrooms.jpg");
-  background-position: center top;
-  z-index: 1
-}*/
-.index {
-  position: relative;
+
+#bg{
+    background-image: url(data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7);
+    background-position: center;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+}
+
+.parentContainer{
+  display: flex;
+  align-items: center;
   text-align: center;
-  top: 25%;
 }
-.indexText {
-	text-shadow: 1px 1px 1px #ccc;
+
+.margin-top-100{
+    margin-top: 100px;
 }
-.indexImg {
-	color: black;
-	text-shadow: 1px 1px 1px #ccc;
-	padding: 15px;
+
+.margin-top-150{
+    margin-top: 100px;
 }
-.newControlls {
-  position: relative;
-  padding-top: 50px;
+
+.margin-top-200{
+    margin-top: 200px;
 }
-.new {
-  position: relative;
-  text-align: center;
-  top: 25%;
+.margin-top-250{
+    margin-top: 250px;
 }
-.item {
-  position: relative;
-  text-align: center;
-  top: 25%;
-}
-.itemChoices {
-  margin-left:auto;
-  margin-right:auto;
-  text-align: left;
-}
-.votedForText {
-  color: black;
+
+.background{
+    background-color: rgba(255, 255, 255, 0.9);
 }

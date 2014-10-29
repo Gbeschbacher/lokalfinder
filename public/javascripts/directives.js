@@ -8,7 +8,7 @@ pollDirective.directive('backgroundDirective', ['$window', function ($window) {
             var win = $(window);
             var winW = win.width(),
             winH = win.height(),
-            $bg = $element,
+            $bg = $($element),
             availableResolution = [
             {x: 3840 , y: 2400},
             {x: 3840, y: 2160},
@@ -42,30 +42,31 @@ pollDirective.directive('backgroundDirective', ['$window', function ($window) {
             {x: 240, y: 400},
             {x: 240, y: 320}];
 
-            var url = $bg.attr('src');
+            var url = $bg.css("background-image");
             var currentRes = url.substr(url.lastIndexOf("/"));
             var currentX = currentRes.match(/([0-9]+)/) ? RegExp.$1 : null;
             var currentY = currentRes.match(/x([0-9]+)/) ? RegExp.$1 : null;
 
             if((!currentX || !currentY)  || ((currentX < winW || currentY < winH)
                   && (currentX < availableResolution[0].x || currentY < availableResolution[0].y))) {
-            var chosenX = availableResolution[0].x;
-            var chosenY = availableResolution[0].y;
 
-            for (var i=availableResolution.length-1; i>=0; i--) {
-             if (availableResolution[i].x >= winW && availableResolution[i].y >= winH) {
-              chosenX = availableResolution[i].x;
-              chosenY = availableResolution[i].y;
-              break;
-           }
+               var chosenX = availableResolution[0].x;
+               var chosenY = availableResolution[0].y;
+               for (var i=availableResolution.length-1; i>=0; i--) {
+                  if (availableResolution[i].x >= winW && availableResolution[i].y >= winH) {
+                     chosenX = availableResolution[i].x;
+                     chosenY = availableResolution[i].y;
+                     break;
+                  }
+               }
+
+               $bg.css('background-image', 'url(http://wallpaperscraft.com/image/39288/' + chosenX + 'x'+ chosenY+'.jpg)');
+               console.log('url(http://wallpaperscraft.com/image/39288/' + chosenX + 'x'+ chosenY+'.jpg)');
          }
 
-         $bg.attr('src', 'http://wallpaperscraft.com/image/39288/' + chosenX + 'x' + chosenY + '.jpg');
-            }
-
-             // Determine whether width or height should be 100%
-             if ((winW / winH) < ($bg[0].width / $bg[0].height)) {
-                  $bg.css({height: '100%', width: 'auto'});
+            // Determine whether width or height should be 100%
+            if ((winW / winH) < ($bg.width() / $bg.height())) {
+               $bg.css({height: '100%', width: 'auto'});
             } else {
                $bg.css({width: '100%', height: 'auto'});
             }
