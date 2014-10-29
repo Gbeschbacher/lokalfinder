@@ -27,9 +27,11 @@ html, body {
     background-size: cover;
 }
 
-.parentContainer{
-  display: flex;
+.flexContainer{
+  display: flex !important;
   align-items: center;
+  justify-content: center;
+  align-content: center;
   text-align: center;
 }
 
@@ -48,6 +50,28 @@ html, body {
     margin-top: 250px;
 }
 
+
+
+.red{
+    background-color: rgba(255, 0, 0, 1);
+}
+.green{
+    background-color: rgba(0, 255, 0, 1);
+}
+.blue{
+    background-color: rgba(0, 0, 255, 1);
+}
+
+
+/**
+    OVERWRITES FOR METRO-UI
+**/
+.color-black{
+    color: black !important;
+}
+.height-reset{
+    height: auto !important;
+}
 .background{
-    background-color: rgba(255, 255, 255, 0.9);
+    background-color: rgba(255, 255, 255, 0.9) !important;
 }

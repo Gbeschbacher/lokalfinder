@@ -60,8 +60,16 @@ pollDirective.directive('backgroundDirective', ['$window', function ($window) {
                   }
                }
 
-               $bg.css('background-image', 'url(http://wallpaperscraft.com/image/39288/' + chosenX + 'x'+ chosenY+'.jpg)');
+               var url = 'http://wallpaperscraft.com/image/39288/' + chosenX + 'x'+ chosenY+'.jpg';
+
+              $('<img/>').attr('src', url).load(function() {
+                  $(this).remove();
+                   $bg.css('background-image', 'url(' + url + ')');
+
+               });
                console.log('url(http://wallpaperscraft.com/image/39288/' + chosenX + 'x'+ chosenY+'.jpg)');
+/*               $bg.css('background-image', 'url(http://wallpaperscraft.com/image/39288/' + chosenX + 'x'+ chosenY+'.jpg)');
+               console.log('url(http://wallpaperscraft.com/image/39288/' + chosenX + 'x'+ chosenY+'.jpg)');*/
          }
 
             // Determine whether width or height should be 100%
