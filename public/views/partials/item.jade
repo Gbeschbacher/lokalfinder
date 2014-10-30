@@ -9,15 +9,16 @@
         tbody
           tr.radio(ng-repeat='choice in poll.choices')
             td
-              input#{{choice._id}}(type='radio', name='choice', ng-model='poll.userVote', value='{{choice._id}}')
+              input(type='radio', name='choice', ng-model='poll.userVote', value='{{choice._id}}', ng-attr-id="{{choice._id}}")
             td
-              label(for='{{choice._id}}')  {{choice.text}}
+              label(for='{{choice._id}}')
+              {{choice.name}}
       button.btn.btn-primary(type='submit')  Vote
   div(ng-show='poll.userVoted')
     table.result-table
       tbody
         tr(ng-repeat='choice in poll.choices')
-          td {{choice.text}}
+          td {{choice.name}}
           td
             table(style='width: {{choice.votes.length/poll.totalVotes*80}}%;')
               tbody
@@ -28,4 +29,4 @@
       | {{poll.totalVotes}} Votes wurden bisher gezählt.
       span(ng-show='poll.userChoice')
         | Du hast dich entschieden für:
-        strong {{poll.userChoice.text}}
+        strong {{poll.userChoice.name}}

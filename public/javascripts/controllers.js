@@ -78,8 +78,7 @@ pollsControler.controller('PollItemCtrl', ['$scope', '$routeParams', 'Poll', 'so
                         socket.emit('send:display', obj);
                 }
 
-                _updateChart();
-                setTimeout(_updateChart, 350);
+                //_updateChart();
 
             });
         });
@@ -87,7 +86,7 @@ pollsControler.controller('PollItemCtrl', ['$scope', '$routeParams', 'Poll', 'so
         socket.on('myvote', function(data){
             if(data._id === $routeParams.pollId){
                 $scope.poll = data;
-                _updateChart();
+                //_updateChart();
             }
         });
 
@@ -169,14 +168,15 @@ pollsControler.controller('PollNewCtrl', ['$scope', '$location', 'Poll', 'NewPol
         $scope.createQuestion = function() {
            if(!$scope.category){
                 $scope.poll.choices = [
-                    {text: "Ja"},
-                    {text: "Nein"}
+                    {name: "Ja"},
+                    {name: "Nein"}
                 ]
            }else if ($scope.category){}
              else {
                 $location.path("/");
            }
 
+           console.log($scope.poll);
             var newPoll = new Poll($scope.poll);
 
            //IF $SCOPE.CATEGORY === FALSE --> RESTAURANT MENU
