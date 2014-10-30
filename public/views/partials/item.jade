@@ -46,17 +46,53 @@ div.margin-top-50
 //-                                         tr
 //-                                           td {{choice.votes.length}}
 
-div.margin-top-50
-    div.flexContainer
-        div.background.padding-15
-            div(ng-repeat='choice in poll.choices')
-                label.input-group-addon.width-reset.color-black.border-radius-0.line-height-reset(for='{{choice._id}}')
-                    div.input-group.flexContainer.flexOptionals
-                        input(type='radio', name='choice', ng-model='poll.userVote', value='{{choice._id}}', ng-attr-id="{{choice._id}}")
-                        span.padding-0-15 {{choice.text}}
-                div.row
-                    div.col-xs-12
 
+div(ng-hide='poll.userVoted')
+    div.margin-top-50
+        div.flexContainer
+            div.background.padding-15
+                div(ng-repeat='choice in poll.choices')
+                    label.input-group-addon.width-reset.color-black.border-radius-0.line-height-reset(for='{{choice._id}}')
+                        div.input-group.flexContainer.flexOptionals
+                            input(type='radio', name='choice', ng-model='poll.userVote', value='{{choice._id}}', ng-attr-id="{{choice._id}}")
+                            span.padding-0-15 {{choice.text}}
+                    div.row
+                        div.col-xs-12
+                button.button.large(ng-class="getButtonColor()", ng-click='vote()') Stimme abgeben!
+
+//- SMALL VERSION OF TABLE
+//- div(ng-show='poll.userVoted')
+//-     div.margin-top-50
+//-         div.flexContainer
+//-             div.background.padding-15
+//-                 table.result-table
+//-                   tbody
+//-                     tr(ng-repeat='choice in poll.choices')
+//-                       td {{choice.text}}
+//-                       td
+//-                         table(style='width: {{choice.votes.length/poll.totalVotes*80}}%;')
+//-                           tbody
+//-                             tr
+//-                               td {{choice.votes.length}}
+
+
+//- BIG VERSION OF TABLE
+div(ng-show='poll.userVoted')
+    div.margin-top-50
+        div.flexContainer
+            div.container
+                div.grid.row
+                    div.row.col-xs-12.col-md-8.col-md-offset-2.background.padding-15
+                        div.height-reset.color-black
+                            table.result-table
+                              tbody
+                                tr(ng-repeat='choice in poll.choices')
+                                  td {{choice.text}}
+                                  td
+                                    table(style='width: {{choice.votes.length/poll.totalVotes*80}}%;')
+                                      tbody
+                                        tr
+                                          td {{choice.votes.length}}
 
 //- div.margin-top-50
 //-     div.flexContainer
@@ -81,10 +117,11 @@ div.margin-top-50
                 div.row.col-xs-12.col-md-8.col-md-offset-2.background.padding-15
                     div.height-reset.color-black
                         p.votedForText
-                          | {{poll.totalVotes > 1? poll.totalVotes : 0}} Votes wurden bisher gezählt.
                           span(ng-show='poll.userChoice')
-                            | Du hast dich entschieden für:
+                            |Du hast für #{' '}
                             strong {{poll.userChoice.text}}
+                            |#{' '}abgestimmt!
+
 
 
 

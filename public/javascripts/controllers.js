@@ -1,34 +1,5 @@
 var pollsControler = angular.module('pollsControler', []);
-pollsControler.filter('propsFilter', function() {
-  return function(items, props) {
-    var out = [];
 
-    if (angular.isArray(items)) {
-      items.forEach(function(item) {
-        var itemMatches = false;
-
-        var keys = Object.keys(props);
-        for (var i = 0; i < keys.length; i++) {
-          var prop = keys[i];
-          var text = props[prop].toLowerCase();
-          if (item[prop].toString().toLowerCase().indexOf(text) !== -1) {
-            itemMatches = true;
-            break;
-          }
-        }
-
-        if (itemMatches) {
-          out.push(item);
-        }
-      });
-    } else {
-      // Let the output be the input untouched
-      out = items;
-    }
-
-    return out;
-  };
-});
 pollsControler.controller('PollListCtrl', ['$scope', 'Poll', 'NewPollCategoryService',
     function ($scope, Poll, NewPollCategoryService) {
         $scope.polls = [];
@@ -99,22 +70,45 @@ pollsControler.controller('PollItemCtrl', ['$scope', '$routeParams', 'Poll', 'so
         });
 
         $scope.vote = function() {
-            var pollId = $scope.poll._id,
-                choiceId = $scope.poll.userVote;
+            if(!$scope.disabled){
+                var pollId = $scope.poll._id,
+                    choiceId = $scope.poll.userVote;
 
-            _checkIp(pollId).$promise.then(function (data){
-                var userVoted = data;
+                _checkIp(pollId).$promise.then(function (data){
+                    var userVoted = data;
 
-                if(!userVoted.userVoted){
-                    if(choiceId){
-                        var voteObj = {poll_id:pollId, choice: choiceId};
-                        socket.emit('send:vote', voteObj);
-                    } else{
-                        // choice in frontend is missing
+                    if(!userVoted.userVoted){
+                        if(choiceId){
+                            var voteObj = {poll_id:pollId, choice: choiceId};
+                            socket.emit('send:vote', voteObj);
+                        }
+                    }else{
+                        $scope.disabled = true;
+                        $scope.button = "danger";
                     }
-                }
-            });
+                }, function (data){
+                });
+            }
         };
+        $scope.getButtonColor = function(){
+            return $scope.button;
+        }
+        $scope.$watch("poll.userVote", function (a, b){
+            if(a || b ){
+                _checkIp($scope.poll._id).$promise.then(function (data){
+                    if(data.userVoted){
+                        $scope.button = "danger";
+                        $scope.disabled = true;
+                    }else{
+                        $scope.button = "success";
+                        $scope.disabled = false;
+                    }
+                });
+            }else{
+                $scope.button = "danger";
+                $scope.disabled = true;
+            }
+        }, true);
 
          function _checkIp(pollId){
             return CheckVote.query({_id: pollId});
@@ -140,10 +134,15 @@ pollsControler.controller('PollNewCtrl', ['$scope', '$location', 'Poll', 'NewPol
     function ($scope, $location, Poll, NewPollCategoryService, $http) {
 
         $scope.category = NewPollCategoryService.getCategory();
+/*        if (!$scope.category || $scope.category) {
+            $location.path("/");
+        }
+*/
 
         $scope.poll = {
             category: $scope.category,
-            choices: []
+            choices: [],
+            dataAsync: []
         };
 
         $scope.dataAsync = {selected: "Bitte wählen oder suchen ..."};
@@ -154,10 +153,12 @@ pollsControler.controller('PollNewCtrl', ['$scope', '$location', 'Poll', 'NewPol
 
 
         $scope.updateDataAsync = function(item, model){
-            $scope.dataAsync = item.name;
             $scope.button = "success";
             if($scope.category){
                 _addRestaurantsOfCategory(item.name);
+                $scope.dataAsync = $scope.poll.choices;
+            }else{
+                $scope.dataAsync[0] = item;
             }
         };
 
@@ -176,10 +177,11 @@ pollsControler.controller('PollNewCtrl', ['$scope', '$location', 'Poll', 'NewPol
                 $location.path("/");
            }
 
-           console.log($scope.poll);
+           $scope.poll.dataAsync = $scope.dataAsync
+            console.log($scope.poll.dataAsync);
+
             var newPoll = new Poll($scope.poll);
 
-           //IF $SCOPE.CATEGORY === FALSE --> RESTAURANT MENU
            if(!$scope.disabled){
                 newPoll.$save(function(p, resp){
                     if(!p.error){
@@ -214,7 +216,7 @@ pollsControler.controller('PollNewCtrl', ['$scope', '$location', 'Poll', 'NewPol
         };
 
      function _showPosition(position) {
-        var range = 0.15,
+        var range = 0.05,
             latitude = parseFloat(position.coords.latitude).toFixed(2),
             longitude = parseFloat(position.coords.longitude).toFixed(2);
 
@@ -244,7 +246,6 @@ pollsControler.controller('PollNewCtrl', ['$scope', '$location', 'Poll', 'NewPol
     // get openstreetmap JSON data from overpass API and save relevant data to variable osmJSON
     function _initRestaurants(coords) {
         var url = "http://overpass.osm.rambler.ru/cgi/interpreter?data=[out:json];node[amenity=restaurant]("+coords.latitudeL+","+coords.longitudeL+","+coords.latitudeR+","+coords.longitudeR+");out;";
-
         $http.get(url)
         .success(function(data, status, headers, config) {
             var data = data.elements
