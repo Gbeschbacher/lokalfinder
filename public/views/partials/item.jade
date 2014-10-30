@@ -12,42 +12,80 @@ div.margin-top-50
         div.container
             div.grid.row
                 div.row.col-xs-12.col-md-8.col-md-offset-2.background.padding-15
-                    div(ng-show='!category')
-                        div.height-reset.color-black
-                            p Welches Restaurant würden Sie gerne mit Ihren Freunden besuchen?
-                            p Wählen Sie bitte nachstehend ein Restaurant in Ihrer Umgebung aus!
-                    div(ng-show='category')
-                        div.height-reset.color-black
-                            p Welche Küche würden Sie gerne mit Ihren Freunden besuchen?
-                            p Wählen Sie bitte nachstehend eine Küche in Ihrer Umgebung aus!
+                    div.height-reset.color-black
+                        p Welches Restaurant würden Sie gerne mit Ihren Freunden besuchen?
+                        p Wählen Sie bitte nachstehend ein Restaurant in Ihrer Umgebung
+
+
+//- div.margin-top-50
+//-     div.flexContainer
+//-         div.container
+//-             div.grid.row
+//-                 div.row.col-xs-12.col-md-8.col-md-offset-2.background.padding-15
+//-                     div.height-reset.color-black
+//-                         div(ng-hide='poll.userVoted')
+//-                             p.lead Bitte wähle eine der folgenden Optionen aus.
+//-                             form(role='form', ng-submit='vote()')
+//-                               table.itemChoices.table.stripped
+//-                                 tbody
+//-                                   tr.radio(ng-repeat='choice in poll.choices')
+//-                                     td
+//-                                       label.checkbox-inline(for='{{choice._id}}')
+//-                                         input(type='radio', name='choice', ng-model='poll.userVote', value='{{choice._id}}', ng-attr-id="{{choice._id}}")
+//-                                         {{choice.text}}
+//-                               button.btn.btn-primary(type='submit')  Vote
+
+//-                           div(ng-show='poll.userVoted')
+//-                             table.result-table
+//-                               tbody
+//-                                 tr(ng-repeat='choice in poll.choices')
+//-                                   td {{choice.text}}
+//-                                   td
+//-                                     table(style='width: {{choice.votes.length/poll.totalVotes*80}}%;')
+//-                                       tbody
+//-                                         tr
+//-                                           td {{choice.votes.length}}
+
+div.margin-top-50
+    div.flexContainer
+        div.background.padding-15
+            div(ng-repeat='choice in poll.choices')
+                label.input-group-addon.width-reset.color-black.border-radius-0.line-height-reset(for='{{choice._id}}')
+                    div.input-group.flexContainer.flexOptionals
+                        input(type='radio', name='choice', ng-model='poll.userVote', value='{{choice._id}}', ng-attr-id="{{choice._id}}")
+                        span.padding-0-15 {{choice.text}}
+                div.row
+                    div.col-xs-12
+
+
+//- div.margin-top-50
+//-     div.flexContainer
+//-         div.container
+//-             div.grid.row
+//-                 div.row.col-xs-12.col-md-8.col-md-offset-2
+//-                     div.height-reset.color-black.red
+//-                         div(ng-repeat='choice in poll.choices')
+//-                             div.input-group.flexContainer.flexOptionals
+//-                                 span.input-group-addon
+//-                                     input(type='radio', name='choice', ng-model='poll.userVote', value='{{choice._id}}', ng-attr-id="{{choice._id}}")
+//-                                 {{choice.text}}
+//-                             div.row
+//-                                 div.col-xs-12
 
 
 
-div(ng-hide='poll.userVoted')
-    p.lead Bitte wähle eine der folgenden Optionen aus.
-    form(role='form', ng-submit='vote()')
-      table.itemChoices
-        tbody
-          tr.radio(ng-repeat='choice in poll.choices')
-            td
-              input(type='radio', name='choice', ng-model='poll.userVote', value='{{choice._id}}', ng-attr-id="{{choice._id}}")
-            td
-              label(for='{{choice._id}}')
-              {{choice.text}}
-      button.btn.btn-primary(type='submit')  Vote
-  div(ng-show='poll.userVoted')
-    table.result-table
-      tbody
-        tr(ng-repeat='choice in poll.choices')
-          td {{choice.text}}
-          td
-            table(style='width: {{choice.votes.length/poll.totalVotes*80}}%;')
-              tbody
-                tr
-                  td {{choice.votes.length}}
-    nvd3(options='chartOptions', data='chartData', api='api', config='chartConfig')
-    p.votedForText
-      | {{poll.totalVotes}} Votes wurden bisher gezählt.
-      span(ng-show='poll.userChoice')
-        | Du hast dich entschieden für:
-        strong {{poll.userChoice.text}}
+div.margin-top-50
+    div.flexContainer
+        div.container
+            div.grid.row
+                div.row.col-xs-12.col-md-8.col-md-offset-2.background.padding-15
+                    div.height-reset.color-black
+                        p.votedForText
+                          | {{poll.totalVotes > 1? poll.totalVotes : 0}} Votes wurden bisher gezählt.
+                          span(ng-show='poll.userChoice')
+                            | Du hast dich entschieden für:
+                            strong {{poll.userChoice.text}}
+
+
+
+nvd3(options='chartOptions', data='chartData', api='api', config='chartConfig')
