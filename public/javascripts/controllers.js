@@ -1,13 +1,13 @@
 var pollsControler = angular.module('pollsControler', []);
 
-pollsControler.controller('PollListCtrl', ['$scope', 'Poll', 'NewPollCategoryService',
-    function ($scope, Poll, NewPollCategoryService) {
+pollsControler.controller('PollListCtrl', ['$scope', 'Poll', 'Data',
+    function ($scope, Poll, Data) {
         $scope.polls = [];
         $scope.polls = Poll.query();
-        $scope.category = null;
 
-        $scope.newPoll = function() {
-            NewPollCategoryService.setCategory($scope.category);
+
+        $scope.newPoll = function(x) {
+            Data.setCategory(x);
         };
     }
 ]);
@@ -130,14 +130,13 @@ pollsControler.controller('PollItemCtrl', ['$scope', '$routeParams', 'Poll', 'so
     }
 ]);
 
-pollsControler.controller('PollNewCtrl', ['$scope', '$location', 'Poll', 'NewPollCategoryService', '$http',
-    function ($scope, $location, Poll, NewPollCategoryService, $http) {
+pollsControler.controller('PollNewCtrl', ['$scope', '$location', 'Poll', 'Data', '$http',
+    function ($scope, $location, Poll, Data, $http) {
 
-        $scope.category = NewPollCategoryService.getCategory();
-/*        if (!$scope.category || $scope.category) {
+        $scope.category = Data.getCategory();
+        if (typeof $scope.category === 'undefined') {
             $location.path("/");
         }
-*/
 
         $scope.poll = {
             category: $scope.category,
