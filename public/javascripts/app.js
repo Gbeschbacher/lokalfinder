@@ -3,7 +3,9 @@ var polls = angular.module('polls', [
     "pollsControler",
     "pollServices",
     "nvd3",
-    "pollDirective"
+    "pollDirective",
+    "ui.select",
+    "ngSanitize"
 ]);
 
 polls.config(['$routeProvider', '$locationProvider',

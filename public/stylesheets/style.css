@@ -35,6 +35,9 @@ html, body {
   text-align: center;
 }
 
+.margin-top-50{
+    margin-top: 50px;
+}
 .margin-top-100{
     margin-top: 100px;
 }
@@ -50,8 +53,17 @@ html, body {
     margin-top: 250px;
 }
 
+.min-width300{
+    min-width: 300px;
+}
 
+.padding-15{
+    padding: 15px;
+}
 
+/**
+    DEBUG BACKGROUNDS
+**/
 .red{
     background-color: rgba(255, 0, 0, 1);
 }
@@ -79,4 +91,12 @@ html, body {
 .row{
     margin-left: 0px !important;
     margin-right: 0px !important;
+}
+
+/**
+    OVERWRITES FOR SELECTIZE
+**/
+
+.selectize-dropdown {
+    margin: -6px 0 0 0 ;
 }

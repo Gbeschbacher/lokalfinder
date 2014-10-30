@@ -73,6 +73,11 @@ pollDirective.directive('backgroundDirective', ['$window', function ($window) {
          }
 
             // Determine whether width or height should be 100%
+            console.log("************");
+            console.log((winW / winH));
+            console.log(($bg.width() / $bg.height()));
+            console.log((winW / winH) < ($bg.width() / $bg.height()));
+
             if ((winW / winH) < ($bg.width() / $bg.height()) ||
                (winW / winH) === ($bg.width() / $bg.height())
                ) {

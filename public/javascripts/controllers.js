@@ -1,5 +1,34 @@
 var pollsControler = angular.module('pollsControler', []);
+pollsControler.filter('propsFilter', function() {
+  return function(items, props) {
+    var out = [];
 
+    if (angular.isArray(items)) {
+      items.forEach(function(item) {
+        var itemMatches = false;
+
+        var keys = Object.keys(props);
+        for (var i = 0; i < keys.length; i++) {
+          var prop = keys[i];
+          var text = props[prop].toLowerCase();
+          if (item[prop].toString().toLowerCase().indexOf(text) !== -1) {
+            itemMatches = true;
+            break;
+          }
+        }
+
+        if (itemMatches) {
+          out.push(item);
+        }
+      });
+    } else {
+      // Let the output be the input untouched
+      out = items;
+    }
+
+    return out;
+  };
+});
 pollsControler.controller('PollListCtrl', ['$scope', 'Poll', 'NewPollCategoryService',
     function ($scope, Poll, NewPollCategoryService) {
         $scope.polls = [];
@@ -108,8 +137,8 @@ pollsControler.controller('PollItemCtrl', ['$scope', '$routeParams', 'Poll', 'so
     }
 ]);
 
-pollsControler.controller('PollNewCtrl', ['$scope', '$location', 'Poll', 'NewPollCategoryService',
-    function ($scope, $location, Poll, NewPollCategoryService) {
+pollsControler.controller('PollNewCtrl', ['$scope', '$location', 'Poll', 'NewPollCategoryService', '$http',
+    function ($scope, $location, Poll, NewPollCategoryService, $http) {
 
         $scope.category = NewPollCategoryService.getCategory();
 
@@ -118,25 +147,34 @@ pollsControler.controller('PollNewCtrl', ['$scope', '$location', 'Poll', 'NewPol
             choices: []
         };
 
-        $scope.createQuestion = function() {
+        $scope.dataAsync = {selected: "Bitte wählen oder suchen ..."};
+        $scope.dataAllAsync = [];
+        $scope.dataCatAllAsync = [];
+        $scope.disabled = true;
+        $scope.button = "danger";
 
-           if(typeof $scope.restaurantSelection != 'undefined'){
+
+        $scope.updateDataAsync = function(item, model){
+            $scope.dataAsync = item.name;
+            $scope.button = "success";
+            if($scope.category){
+                _addRestaurantsOfCategory(item.name);
+            }
+        };
+
+        $scope.getButtonColor = function(){
+            return $scope.button;
+        };
+
+        $scope.createQuestion = function() {
+           if(!$scope.category){
                 $scope.poll.choices = [
                     {text: "Ja"},
                     {text: "Nein"}
                 ]
-           }else if (typeof $scope.categorySelection != 'undefined'){
-                /*
-                write all available restaurants from the chosen category to var
-                    $scope.poll.choices = [{}, {}, {}]
-                */
-
-                $scope.poll.choices = cuisineRestaurants;
-
-           }else {
-                /*
-
-                */
+           }else if ($scope.category){}
+             else {
+                $location.path("/");
            }
 
             var newPoll = new Poll($scope.poll);
@@ -155,25 +193,26 @@ pollsControler.controller('PollNewCtrl', ['$scope', '$location', 'Poll', 'NewPol
             Helper Functions
         */
 
-        function _checkForDoubleCategory(obj, x) {
+        function _checkForDoubleCategory(x) {
+            var obj = $scope.dataCatAllAsync;
             for (var i = 0; i < obj.length; i++) {
-                    if (x === obj[i].text) {
+                    if (x === obj[i].name) {
                         return true;
                     }
             }
             return false;
         }
 
-        function getLocation() {
+        function _getLocation() {
             if (navigator.geolocation) {
-               navigator.geolocation.getCurrentPosition(showPosition);
+               navigator.geolocation.getCurrentPosition(_showPosition);
             } else {
              // filler text ... geolocation not supported by client
             }
         };
 
-     function showPosition(position) {
-        var range = 0.05,
+     function _showPosition(position) {
+        var range = 0.15,
             latitude = parseFloat(position.coords.latitude).toFixed(2),
             longitude = parseFloat(position.coords.longitude).toFixed(2);
 
@@ -185,107 +224,90 @@ pollsControler.controller('PollNewCtrl', ['$scope', '$location', 'Poll', 'NewPol
         };
 
         if ($scope.category === true) {
-            initCategories(coords); // show cuisine/food category picker
+            _initCategories(coords); // show cuisine/food category picker
         }
         else if ($scope.category === false) {
-            initRestaurants(coords); // show restaurant category picker
+            _initRestaurants(coords); // show restaurant category picker
         }
         else {
             $location.path("/");
         }
     }
-    getLocation();
+    _getLocation();
 
-
-    var osmCategoryJSON = [];
-    var osmRestaurantsJSON = [];
-    var osmCategoryRestaurantsJSON = [];
-    var cuisineRestaurants = [];
 
     // get openstreetmap JSON data from overpass API and save relevant data to variable osmJSON
-    function initRestaurants(coords) {
+    function _initRestaurants(coords) {
         var url = "http://overpass.osm.rambler.ru/cgi/interpreter?data=[out:json];node[amenity=restaurant]("+coords.latitudeL+","+coords.longitudeL+","+coords.latitudeR+","+coords.longitudeR+");out;";
 
-        $.getJSON(url, function(json){
-            for (var i = 0; i < json.elements.length; i++) {
-                osmRestaurantsJSON.push({
-                    "id": i+1 ,
-                    "text": json.elements[i].tags.name ,
-                    "osmid":json.elements[i].id,
-                    "lat":json.elements[i].lat ,
-                    "lon":json.elements[i].lon
+        $http.get(url)
+        .success(function(data, status, headers, config) {
+            var data = data.elements
+            $scope.dataAllAsync = [];
+            for(var i = 0; i < data.length; i++){
+                $scope.dataAllAsync.push({
+                    "name": data[i].tags.name,
+                    "lat" : data[i].lat,
+                    "lon" : data[i].lon
                 });
             }
-
+            $scope.disabled = false;
+        })
+        .error(function(data, status, headers, config) {
+            console.error(data);
+            $scope.dataAsync.selected = "Fehler aufgetreten!";
+            $scope.disabled = true;
         });
     }
 
     // get openstreetmap JSON data from overpass API and save relevant data to variable osmJSON
-    function initCategories(coords) {
+    function _initCategories(coords) {
         var url = "http://overpass.osm.rambler.ru/cgi/interpreter?data=[out:json];node[amenity=restaurant][cuisine]("+coords.latitudeL+","+coords.longitudeL+","+coords.latitudeR+","+coords.longitudeR+");out;";
 
-        $.getJSON(url, function(json){
-            for (var i = 0; i < json.elements.length; i++) {
-                osmCategoryRestaurantsJSON.push({
-                    "id":i+1 ,
-                    "name":json.elements[i].tags.name ,
-                    "cuisine":json.elements[i].tags.cuisine ,
-                    "osmid":json.elements[i].id,
-                    "lat":json.elements[i].lat ,
-                    "lon":json.elements[i].lon
+        $http.get(url)
+        .success(function(data, status, headers, config) {
+            var data = data.elements
+            $scope.dataAllAsync = [];
+            $scope.dataCatAllAsync = [];
+
+            for(var i = 0; i < data.length; i++){
+                $scope.dataAllAsync.push({
+                    "name": data[i].tags.name,
+                    "lat" : data[i].lat,
+                    "lon" : data[i].lon,
+                    "cuisine": data[i].tags.cuisine
                 });
 
-                // prohibit double entries to get a JSON with unique foods/cuisines
-                if (!_checkForDoubleCategory(osmCategoryJSON,json.elements[i].tags.cuisine)) {
-
-                    osmCategoryJSON.push({
-                        "id":i+1 ,
-                        "text":json.elements[i].tags.cuisine
-                    });
+                if (!_checkForDoubleCategory(data[i].tags.cuisine)) {
+                        $scope.dataCatAllAsync .push({
+                            "name": data[i].tags.cuisine
+                        });
                 }
             }
+            $scope.disabled = false;
+        })
+        .error(function(data, status, headers, config) {
+            console.error(data);
+            $scope.dataAsync.selected = "Fehler aufgetreten!";
+            $scope.disabled = true;
         });
     }
 
-    function addCategoryRestaurants() {
-        for (var i = 0; i < osmCategoryRestaurantsJSON.length; i++) {
-            if (osmCategoryRestaurantsJSON[i].cuisine === $scope.categorySelection.text) {
-                cuisineRestaurants.push({
-                    "id":osmCategoryRestaurantsJSON[i].id ,
-                    "text":osmCategoryRestaurantsJSON[i].name ,
-                    "cuisine":osmCategoryRestaurantsJSON[i].cuisine ,
-                    "osmid":osmCategoryRestaurantsJSON[i].osmid,
-                    "lat":osmCategoryRestaurantsJSON[i].lat ,
-                    "lon":osmCategoryRestaurantsJSON[i].lon
+    function _addRestaurantsOfCategory(_cuisine) {
+        var data = $scope.dataAllAsync;
+        $scope.poll.choices = [];
+        for (var i = 0; i < data.length; i++) {
+            if (data[i].cuisine === _cuisine) {
+                $scope.poll.choices.push({
+                    "name":data[i].name ,
+                    "cuisine":data[i].cuisine,
+                    "lat":data[i].lat ,
+                    "lon":data[i].lon
                 });
             }
         }
     }
 
-    $('#selectRestaurant').select2({
-        data: osmRestaurantsJSON,
-        placeholder: "Wähle ein Restaurant...",
-        multiple: false,
-        width: "270px"
-    });
-
-
-    $('#selectCategory').select2({
-        data: osmCategoryJSON,
-        placeholder: "Wähle eine Küche...",
-        multiple: false,
-        width: "270px"
-    });
-
-    $("#selectRestaurant").on("change", function() {
-        $scope.restaurantSelection = $('#selectRestaurant').select2('data');
-    });
-
-
-    $("#selectCategory").on("change", function() {
-        $scope.categorySelection = $('#selectCategory').select2('data');
-        addCategoryRestaurants();
-    });
 }
 ]);
 
