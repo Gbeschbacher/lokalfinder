@@ -168,8 +168,8 @@ pollsControler.controller('PollNewCtrl', ['$scope', '$location', 'Poll', 'NewPol
         $scope.createQuestion = function() {
            if(!$scope.category){
                 $scope.poll.choices = [
-                    {name: "Ja"},
-                    {name: "Nein"}
+                    {text: "Ja"},
+                    {text: "Nein"}
                 ]
            }else if ($scope.category){}
              else {
@@ -299,7 +299,7 @@ pollsControler.controller('PollNewCtrl', ['$scope', '$location', 'Poll', 'NewPol
         for (var i = 0; i < data.length; i++) {
             if (data[i].cuisine === _cuisine) {
                 $scope.poll.choices.push({
-                    "name":data[i].name ,
+                    "text":data[i].name ,
                     "cuisine":data[i].cuisine,
                     "lat":data[i].lat ,
                     "lon":data[i].lon

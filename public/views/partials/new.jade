@@ -5,6 +5,7 @@ div.flexContainer.background
                 h1 Lokalfinder
                 div.row
                     div.col-xs-12
+                h2 Umfrage erstellen!
 
 
 div.margin-top-50
@@ -12,12 +13,11 @@ div.margin-top-50
         div.container
             div.grid.row
                 div.row.col-xs-12.col-md-8.col-md-offset-2.background.padding-15
-                    div(ng-show='!category')
-                        div.height-reset.color-black
+                    div.height-reset.color-black
+                        div(ng-show='!category')
                             p Welches Restaurant würden Sie gerne mit Ihren Freunden besuchen?
                             p Wählen Sie bitte nachstehend ein Restaurant in Ihrer Umgebung aus!
-                    div(ng-show='category')
-                        div.height-reset.color-black
+                        div(ng-show='category')
                             p Welche Küche würden Sie gerne mit Ihren Freunden besuchen?
                             p Wählen Sie bitte nachstehend eine Küche in Ihrer Umgebung aus!
 
