@@ -12,35 +12,36 @@ pollsControler.controller('PollListCtrl', ['$scope', 'Poll', 'Data',
     }
 ]);
 
-pollsControler.controller('PollItemCtrl', ['$scope', '$routeParams', 'Poll', 'socket', 'CheckVote',
-    function ($scope, $routeParams, Poll, socket, CheckVote) {
+pollsControler.controller('PollItemCtrl', ['$scope', '$routeParams', 'Poll', 'socket', 'CheckVote', 'Data',
+    function ($scope, $routeParams, Poll, socket, CheckVote, Data) {
         $scope.chartData = [];
-        $scope.chartOptions = {
-            chart: {
-                type: 'pieChart',
-                height: 300,
-                x: function(d){return d.key;},
-                y: function(d){return d.y;},
-                showLabels: true,
-                transitionDuration: 500,
-                labelThreshold: 0.01,
-                "showLegend": false,
-                "tooltips": false,
-            }
-        };
+        $scope.chart = {};
+        $scope.chart.chartData = [];
+        $scope.chart.noData = "Laden ...";
+        $scope.leadingRestaurant = "";
+        $scope.category = Data.getCategory()
 
-        $scope.chartConfig = {
-            visible: false,
-            extended: true,
-            disabled: false,
-            autorefresh: true,
-            refreshDataOnly: false
-        };
+        console.log("category");
+
+
+        $scope.chart.xFunction = function(){
+            return function(d) {
+                return d.key;
+            };
+        }
+
+        $scope.chart.yFunction = function(){
+            return function(d){
+                return d.y;
+            };
+        }
 
         Poll.get({
             _id: $routeParams.pollId
         }, function(data){
             $scope.poll = data;
+            $scope.poll.choices.sort(_sortArrayDesc);
+            console.log($scope.poll)
             _checkIp($scope.poll._id).$promise.then(function (data){
                 var userVoted = data;
 
@@ -49,7 +50,7 @@ pollsControler.controller('PollItemCtrl', ['$scope', '$routeParams', 'Poll', 'so
                         socket.emit('send:display', obj);
                 }
 
-                //_updateChart();
+                _updateChart();
 
             });
         });
@@ -57,7 +58,8 @@ pollsControler.controller('PollItemCtrl', ['$scope', '$routeParams', 'Poll', 'so
         socket.on('myvote', function(data){
             if(data._id === $routeParams.pollId){
                 $scope.poll = data;
-                //_updateChart();
+                $scope.poll.choices.sort(_sortArrayDesc);
+                _updateChart();
             }
         });
 
@@ -65,6 +67,7 @@ pollsControler.controller('PollItemCtrl', ['$scope', '$routeParams', 'Poll', 'so
             if(data._id === $routeParams.pollId){
                 $scope.poll.choices = data.choices;
                 $scope.poll.totalVotes = data.totalVotes;
+                $scope.poll.choices.sort(_sortArrayDesc);
                 _updateChart();
             }
         });
@@ -90,9 +93,11 @@ pollsControler.controller('PollItemCtrl', ['$scope', '$routeParams', 'Poll', 'so
                 });
             }
         };
+
         $scope.getButtonColor = function(){
             return $scope.button;
-        }
+        };
+
         $scope.$watch("poll.userVote", function (a, b){
             if(a || b ){
                 _checkIp($scope.poll._id).$promise.then(function (data){
@@ -119,14 +124,16 @@ pollsControler.controller('PollItemCtrl', ['$scope', '$routeParams', 'Poll', 'so
             for(var i=0; i < $scope.poll.choices.length; i++){
                 var obj = {
                     key: $scope.poll.choices[i].text,
-                    y: $scope.poll.choices[i].votes.length + Math.random()
+                    y: $scope.poll.choices[i].votes.length
                 };
                 data.push(obj);
             }
-            $scope.chartData = data;
-            $scope.api.refresh();
+            $scope.chart.chartData = data;
         }
 
+        function _sortArrayDesc(a,b){
+            return b.votes.length-a.votes.length
+        };
     }
 ]);
 
@@ -215,7 +222,7 @@ pollsControler.controller('PollNewCtrl', ['$scope', '$location', 'Poll', 'Data',
         };
 
      function _showPosition(position) {
-        var range = 0.05,
+        var range = 0.15,
             latitude = parseFloat(position.coords.latitude).toFixed(2),
             longitude = parseFloat(position.coords.longitude).toFixed(2);
 

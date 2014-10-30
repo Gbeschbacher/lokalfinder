@@ -14,7 +14,7 @@ html, body {
     text-align: right;
 }
 .result-table td table {
-    background-color: lightblue;
+    background-color: lightcoral;
     text-align: right;
 }
 .result-table > tbody > tr:first-child table {
@@ -87,6 +87,10 @@ html, body {
 /**
     OVERWRITES FOR METRO-UI
 **/
+.height-100{
+    height: 100%;
+}
+
 .color-black{
     color: black !important;
 }
@@ -98,6 +102,9 @@ html, body {
 .input-group-addon:first-child {
     border: 1px solid #ccc;
     padding: 10px 25px;
+}
+.padding-reset {
+    padding: 0px;
 }
 
 .line-height-reset{

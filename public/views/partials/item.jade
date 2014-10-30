@@ -11,42 +11,25 @@ div.margin-top-50
     div.flexContainer
         div.container
             div.grid.row
-                div.row.col-xs-12.col-md-8.col-md-offset-2.background.padding-15
+                div.row.col-xs-12.background.padding-15
                     div.height-reset.color-black
-                        p Welches Restaurant würden Sie gerne mit Ihren Freunden besuchen?
-                        p Wählen Sie bitte nachstehend ein Restaurant in Ihrer Umgebung
+                        div(ng-hide='poll.userVoted')
+                            div(ng-if='category')
+                                p
+                                    |Bitte stimmen Sie ab in welches Restaurant sie gehen möchten. Als Küche wurde#{' '}
+                                    strong {{poll.dataAsync[0].cuisine}}
+                                    |#{' '}ausgewählt.
+                        div(ng-hide='poll.userVoted')
+                            div(ng-if='!category')
+                                p
+                                    |Bitte stimmen Sie ab, ob sie ins Restaurant#{' '}
+                                    strong {{poll.dataAsync[0].name}}
+                                    |#{' '}mitgehen möchten.
 
+                        div(ng-show='poll.userVoted')
+                            p Eventually  show google maps with long und lat of leading restaurant here
 
-//- div.margin-top-50
-//-     div.flexContainer
-//-         div.container
-//-             div.grid.row
-//-                 div.row.col-xs-12.col-md-8.col-md-offset-2.background.padding-15
-//-                     div.height-reset.color-black
-//-                         div(ng-hide='poll.userVoted')
-//-                             p.lead Bitte wähle eine der folgenden Optionen aus.
-//-                             form(role='form', ng-submit='vote()')
-//-                               table.itemChoices.table.stripped
-//-                                 tbody
-//-                                   tr.radio(ng-repeat='choice in poll.choices')
-//-                                     td
-//-                                       label.checkbox-inline(for='{{choice._id}}')
-//-                                         input(type='radio', name='choice', ng-model='poll.userVote', value='{{choice._id}}', ng-attr-id="{{choice._id}}")
-//-                                         {{choice.text}}
-//-                               button.btn.btn-primary(type='submit')  Vote
-
-//-                           div(ng-show='poll.userVoted')
-//-                             table.result-table
-//-                               tbody
-//-                                 tr(ng-repeat='choice in poll.choices')
-//-                                   td {{choice.text}}
-//-                                   td
-//-                                     table(style='width: {{choice.votes.length/poll.totalVotes*80}}%;')
-//-                                       tbody
-//-                                         tr
-//-                                           td {{choice.votes.length}}
-
-
+//- USER VOTING TABLE
 div(ng-hide='poll.userVoted')
     div.margin-top-50
         div.flexContainer
@@ -58,9 +41,12 @@ div(ng-hide='poll.userVoted')
                             span.padding-0-15 {{choice.text}}
                     div.row
                         div.col-xs-12
-                button.button.large(ng-class="getButtonColor()", ng-click='vote()') Stimme abgeben!
+                label.input-group-addon.width-reset.color-black.border-radius-0.line-height-reset.width-height-100.padding-reset
+                    button.button.large(ng-class="getButtonColor()", ng-click='vote()', style="width:100%;") Stimme abgeben!
+    div.row
+        div.col-xs-12.margin-top-50
 
-//- SMALL VERSION OF TABLE
+//- SMALL VERSION OF RESULT TABLE
 //- div(ng-show='poll.userVoted')
 //-     div.margin-top-50
 //-         div.flexContainer
@@ -76,13 +62,13 @@ div(ng-hide='poll.userVoted')
 //-                               td {{choice.votes.length}}
 
 
-//- BIG VERSION OF TABLE
+//- BIG VERSION OF RESULT TABLE
 div(ng-show='poll.userVoted')
     div.margin-top-50
         div.flexContainer
             div.container
                 div.grid.row
-                    div.row.col-xs-12.col-md-8.col-md-offset-2.background.padding-15
+                    div.row.col-xs-12.background.padding-15
                         div.height-reset.color-black
                             table.result-table
                               tbody
@@ -94,30 +80,31 @@ div(ng-show='poll.userVoted')
                                         tr
                                           td {{choice.votes.length}}
 
-//- div.margin-top-50
-//-     div.flexContainer
-//-         div.container
-//-             div.grid.row
-//-                 div.row.col-xs-12.col-md-8.col-md-offset-2
-//-                     div.height-reset.color-black.red
-//-                         div(ng-repeat='choice in poll.choices')
-//-                             div.input-group.flexContainer.flexOptionals
-//-                                 span.input-group-addon
-//-                                     input(type='radio', name='choice', ng-model='poll.userVote', value='{{choice._id}}', ng-attr-id="{{choice._id}}")
-//-                                 {{choice.text}}
-//-                             div.row
-//-                                 div.col-xs-12
+//- PIE-CHART AS RESULT
+div.margin-top-50(ng-show='poll.userVoted')
+    div.flexContainer
+        div.container
+                div.row.col-xs-12
+                    div.height-reset.color-black.background
+                        nvd3-pie-chart(
+                            data="chart.chartData",
+                            noData ="chart.noData"
+                            id="exampleId",
+                            x="chart.xFunction()",
+                            y="chart.yFunction()",
+                            showLabels="true",
+                            width=250,
+                            height=250)
 
-
-
-div.margin-top-50
+//- WHAT DID THE USER VOTE FOR
+div.margin-top-50(ng-show='poll.userChoice')
     div.flexContainer
         div.container
             div.grid.row
-                div.row.col-xs-12.col-md-8.col-md-offset-2.background.padding-15
+                div.row.col-xs-12.background.padding-15
                     div.height-reset.color-black
                         p.votedForText
-                          span(ng-show='poll.userChoice')
+                          span
                             |Du hast für #{' '}
                             strong {{poll.userChoice.text}}
                             |#{' '}abgestimmt!
@@ -125,4 +112,3 @@ div.margin-top-50
 
 
 
-nvd3(options='chartOptions', data='chartData', api='api', config='chartConfig')
