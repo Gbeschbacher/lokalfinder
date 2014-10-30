@@ -180,12 +180,14 @@ pollsControler.controller('PollNewCtrl', ['$scope', '$location', 'Poll', 'NewPol
             var newPoll = new Poll($scope.poll);
 
            //IF $SCOPE.CATEGORY === FALSE --> RESTAURANT MENU
-            newPoll.$save(function(p, resp){
-                if(!p.error){
-                    $location.path('poll/'+p._id);
-                } else {
-                }
-            });
+           if(!$scope.disabled){
+                newPoll.$save(function(p, resp){
+                    if(!p.error){
+                        $location.path('poll/'+p._id);
+                    } else {
+                    }
+                });
+            }
 
         };
 
@@ -235,6 +237,9 @@ pollsControler.controller('PollNewCtrl', ['$scope', '$location', 'Poll', 'NewPol
     }
     _getLocation();
 
+    function _isNotUndefined(name){
+        return (typeof name !== "undefined")
+    }
 
     // get openstreetmap JSON data from overpass API and save relevant data to variable osmJSON
     function _initRestaurants(coords) {
@@ -245,13 +250,17 @@ pollsControler.controller('PollNewCtrl', ['$scope', '$location', 'Poll', 'NewPol
             var data = data.elements
             $scope.dataAllAsync = [];
             for(var i = 0; i < data.length; i++){
-                $scope.dataAllAsync.push({
-                    "name": data[i].tags.name,
-                    "lat" : data[i].lat,
-                    "lon" : data[i].lon
-                });
+                if(_isNotUndefined(data[i].tags.name)){
+                    $scope.dataAllAsync.push({
+                        "name": data[i].tags.name,
+                        "lat" : data[i].lat,
+                        "lon" : data[i].lon
+                    });
+                }
             }
-            $scope.disabled = false;
+            if($scope.dataAllAsync.length > 0){
+                $scope.disabled = false;
+            }
         })
         .error(function(data, status, headers, config) {
             console.error(data);
@@ -271,20 +280,24 @@ pollsControler.controller('PollNewCtrl', ['$scope', '$location', 'Poll', 'NewPol
             $scope.dataCatAllAsync = [];
 
             for(var i = 0; i < data.length; i++){
-                $scope.dataAllAsync.push({
-                    "name": data[i].tags.name,
-                    "lat" : data[i].lat,
-                    "lon" : data[i].lon,
-                    "cuisine": data[i].tags.cuisine
-                });
+                if(_isNotUndefined(data[i].tags.name)){
+                    $scope.dataAllAsync.push({
+                        "name": data[i].tags.name,
+                        "lat" : data[i].lat,
+                        "lon" : data[i].lon,
+                        "cuisine": data[i].tags.cuisine
+                    });
 
-                if (!_checkForDoubleCategory(data[i].tags.cuisine)) {
-                        $scope.dataCatAllAsync .push({
-                            "name": data[i].tags.cuisine
-                        });
+                    if (!_checkForDoubleCategory(data[i].tags.cuisine)) {
+                            $scope.dataCatAllAsync .push({
+                                "name": data[i].tags.cuisine
+                            });
+                    }
                 }
             }
-            $scope.disabled = false;
+            if($scope.dataCatAllAsync.length > 0){
+                $scope.disabled = false;
+            }
         })
         .error(function(data, status, headers, config) {
             console.error(data);
