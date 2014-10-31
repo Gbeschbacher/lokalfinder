@@ -13,7 +13,7 @@ polls.config(['$routeProvider', '$locationProvider',
         $locationProvider.html5Mode(true);
         $routeProvider.
             when('/', { templateUrl: 'partials/index', controller: 'PollListCtrl'}).
-            when('/poll/create', { templateUrl: 'partials/new', controller: 'PollNewCtrl'}).
+            when('/poll/create/:option', { templateUrl: 'partials/new', controller: 'PollNewCtrl'}).
             when('/poll/:pollId', { templateUrl: 'partials/item', controller: 'PollItemCtrl'})
             .otherwise({ redirectTo: '/' });
     }]);

@@ -12,22 +12,6 @@ service.factory('CheckVote', function($resource){
     });
 });
 
-service.factory('Data', function(){
-    var data = {
-      category: undefined
-    };
-
-    return {
-      getCategory: function(){
-        return data.category;
-      },
-      setCategory: function(x){
-        data.category = x;
-      }
-    };
-});
-
-
 service.factory('socket', function ($rootScope) {
   var socket = io.connect();
   return {

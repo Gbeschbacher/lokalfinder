@@ -11,7 +11,7 @@ div.margin-top-150
     div.container
         div.grid.row.flexContainer
             div.flexContainer.row.col-xs-12.col-md-8.col-md-offset-2
-                a.tile.double.background.height-reset.color-black(href='poll/create' ng-click='category=false; newPoll(false);')
+                a.tile.double.background.height-reset.color-black(href='poll/create/restaurant' ng-click='newPoll();')
                     div.grid.row
                         div.row.col-xs-12
                             h2 Restaurant
@@ -20,7 +20,7 @@ div.margin-top-150
                         div.row
                             div.col-xs-12 &nbsp;
 
-                a.tile.double.background.height-reset.color-black(href='poll/create' ng-click='category=true; newPoll(true);')
+                a.tile.double.background.height-reset.color-black(href='poll/create/cuisine' ng-click='newPoll();')
                     div.grid.row
                         div.row.col-xs-12
                             h2 Kategorie

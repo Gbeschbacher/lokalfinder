@@ -1,28 +1,20 @@
 var pollsControler = angular.module('pollsControler', []);
 
-pollsControler.controller('PollListCtrl', ['$scope', 'Poll', 'Data',
-    function ($scope, Poll, Data) {
+pollsControler.controller('PollListCtrl', ['$scope', 'Poll',
+    function ($scope, Poll) {
         $scope.polls = [];
         $scope.polls = Poll.query();
-
-
-        $scope.newPoll = function(x) {
-            Data.setCategory(x);
-        };
     }
 ]);
 
-pollsControler.controller('PollItemCtrl', ['$scope', '$routeParams', 'Poll', 'socket', 'CheckVote', 'Data',
-    function ($scope, $routeParams, Poll, socket, CheckVote, Data) {
+pollsControler.controller('PollItemCtrl', ['$scope', '$routeParams', 'Poll', 'socket', 'CheckVote',
+    function ($scope, $routeParams, Poll, socket, CheckVote) {
         $scope.chartData = [];
         $scope.chart = {};
         $scope.chart.chartData = [];
         $scope.chart.noData = "Laden ...";
         $scope.leadingRestaurant = "";
         $scope.category = Data.getCategory()
-
-        console.log("category");
-
 
         $scope.chart.xFunction = function(){
             return function(d) {
@@ -137,12 +129,15 @@ pollsControler.controller('PollItemCtrl', ['$scope', '$routeParams', 'Poll', 'so
     }
 ]);
 
-pollsControler.controller('PollNewCtrl', ['$scope', '$location', 'Poll', 'Data', '$http',
-    function ($scope, $location, Poll, Data, $http) {
+pollsControler.controller('PollNewCtrl', ['$scope', '$location', 'Poll',
+    '$http', '$routeParams',
+    function ($scope, $location, Poll, $http, $routeParams) {
 
-        $scope.category = Data.getCategory();
-        if (typeof $scope.category === 'undefined') {
-            $location.path("/");
+        $scope.routeParam = $routeParams.option;
+
+        $scope.category  = false;
+        if($scope.routeParam === "cuisine"){
+            $scope.category = true;
         }
 
         $scope.poll = {
@@ -151,7 +146,7 @@ pollsControler.controller('PollNewCtrl', ['$scope', '$location', 'Poll', 'Data',
             dataAsync: []
         };
 
-        $scope.dataAsync = {selected: "Bitte wählen oder suchen ..."};
+        $scope.dataAsync = {selected: "Daten werden geladen ..."};
         $scope.dataAllAsync = [];
         $scope.dataCatAllAsync = [];
         $scope.disabled = true;
@@ -178,13 +173,9 @@ pollsControler.controller('PollNewCtrl', ['$scope', '$location', 'Poll', 'Data',
                     {text: "Ja"},
                     {text: "Nein"}
                 ]
-           }else if ($scope.category){}
-             else {
-                $location.path("/");
            }
 
-           $scope.poll.dataAsync = $scope.dataAsync
-            console.log($scope.poll.dataAsync);
+           $scope.poll.dataAsync = $scope.dataAsync;
 
             var newPoll = new Poll($scope.poll);
 
@@ -222,7 +213,7 @@ pollsControler.controller('PollNewCtrl', ['$scope', '$location', 'Poll', 'Data',
         };
 
      function _showPosition(position) {
-        var range = 0.05,
+        var range = 0.15,
             latitude = parseFloat(position.coords.latitude).toFixed(2),
             longitude = parseFloat(position.coords.longitude).toFixed(2);
 
@@ -233,14 +224,13 @@ pollsControler.controller('PollNewCtrl', ['$scope', '$location', 'Poll', 'Data',
             longitudeR: parseFloat(longitude) + range
         };
 
-        if ($scope.category === true) {
+        console.log($routeParams.option);
+        console.log($routeParams.option === "cuisine");
+        if ($scope.category) {
             _initCategories(coords); // show cuisine/food category picker
         }
-        else if ($scope.category === false) {
+        else{
             _initRestaurants(coords); // show restaurant category picker
-        }
-        else {
-            $location.path("/");
         }
     }
     _getLocation();
@@ -267,6 +257,7 @@ pollsControler.controller('PollNewCtrl', ['$scope', '$location', 'Poll', 'Data',
             }
             if($scope.dataAllAsync.length > 0){
                 $scope.disabled = false;
+                $scope.dataAsync = {selected: "Bitte wählen oder suchen ..."};
             }
         })
         .error(function(data, status, headers, config) {
@@ -304,6 +295,7 @@ pollsControler.controller('PollNewCtrl', ['$scope', '$location', 'Poll', 'Data',
             }
             if($scope.dataCatAllAsync.length > 0){
                 $scope.disabled = false;
+                $scope.dataAsync = {selected: "Bitte wählen oder suchen ..."};
             }
         })
         .error(function(data, status, headers, config) {
