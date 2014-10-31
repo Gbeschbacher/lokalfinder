@@ -213,7 +213,7 @@ pollsControler.controller('PollNewCtrl', ['$scope', '$location', 'Poll',
         };
 
      function _showPosition(position) {
-        var range = 0.35,
+        var range = 0.05,
             latitude = parseFloat(position.coords.latitude).toFixed(2),
             longitude = parseFloat(position.coords.longitude).toFixed(2);
 
