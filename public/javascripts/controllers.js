@@ -1,5 +1,11 @@
 var pollsControler = angular.module('pollsControler', []);
 
+pollsControler.filter('iif', function () {
+   return function(input, trueValue, falseValue) {
+        return input ? trueValue : falseValue;
+   };
+});
+
 pollsControler.controller('PollListCtrl', ['$scope', 'Poll',
     function ($scope, Poll) {
         $scope.polls = [];
@@ -31,9 +37,9 @@ pollsControler.controller('PollItemCtrl', ['$scope', '$routeParams', 'Poll', 'so
             _id: $routeParams.pollId
         }, function(data){
             $scope.poll = data;
-            $scope.category = $scope.poll.category
+            $scope.category = $scope.poll.category;
+            $scope.dataAsync =$scope.poll.dataAsync;
             $scope.poll.choices.sort(_sortArrayDesc);
-            console.log($scope.poll)
             _checkIp($scope.poll._id).$promise.then(function (data){
                 var userVoted = data;
 
@@ -213,7 +219,7 @@ pollsControler.controller('PollNewCtrl', ['$scope', '$location', 'Poll',
         };
 
      function _showPosition(position) {
-        var range = 0.05,
+        var range = 0.35,
             latitude = parseFloat(position.coords.latitude).toFixed(2),
             longitude = parseFloat(position.coords.longitude).toFixed(2);
 

@@ -26,7 +26,21 @@ div.margin-top-50
                                     |#{' '}mitgehen möchten.
 
                         div(ng-show='poll.userVoted')
-                            p Eventually  show google maps with long und lat of leading restaurant here
+                            div(ng-if='category')
+                                p
+                                    | Die Umfrage handelt von der Küche #{' '}
+                                    strong {{dataAsync[0].cuisine}}
+                                    |. Sie haben sich für das Restaurant #{' '}
+                                    strong {{poll.userChoice.text}}
+                                    |#{' '}entschieden.
+
+                            div(ng-if='!category')
+                                p
+                                    | Die Umfrage handelt vom Restaurant#{' '}
+                                    strong {{dataAsync[0].name}}
+                                    |. Sie haben sich dafür entschieden#{' '}
+                                    strong {{poll.userChoice.text =="ja" | iif : "mitgehen" : "nicht mitgehen"}}
+                                    |#{' '}zu wollen.
 
 //- USER VOTING TABLE
 div(ng-hide='poll.userVoted')
@@ -84,7 +98,7 @@ div.margin-top-50(ng-show='poll.userVoted')
     div.flexContainer
         div.container
                 div.row.col-xs-12
-                    div.height-reset.color-black.background
+                    div.height-reset.color-black.background.col-md-6.col-md-offset-3
                         nvd3-pie-chart(
                             data="chart.chartData",
                             noData ="chart.noData"
@@ -96,17 +110,17 @@ div.margin-top-50(ng-show='poll.userVoted')
                             height=250)
 
 //- WHAT DID THE USER VOTE FOR
-div.margin-top-50(ng-show='poll.userChoice')
-    div.flexContainer
-        div.container
-            div.grid.row
-                div.row.col-xs-12.background.padding-15
-                    div.height-reset.color-black
-                        p.votedForText
-                          span
-                            |Du hast für #{' '}
-                            strong {{poll.userChoice.text}}
-                            |#{' '}abgestimmt!
+//- div.margin-top-50(ng-show='poll.userChoice')
+//-     div.flexContainer
+//-         div.container
+//-             div.grid.row
+//-                 div.row.col-xs-12.background.padding-15
+//-                     div.height-reset.color-black
+//-                         p.votedForText
+//-                           span
+//-                             |Du hast für #{' '}
+//-                             strong {{poll.userChoice.text}}
+//-                             |#{' '}abgestimmt!
 
 
 
