@@ -1,4 +1,5 @@
 extends layout
 
 block content
-    div#bg(background-directive ng-view)
+    div#bg(background-directive)
+        div.scrollContainer(ng-view, perfect-directive)

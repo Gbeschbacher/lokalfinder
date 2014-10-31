@@ -1,6 +1,7 @@
 var pollDirective = angular.module("pollDirective", [])
 
-pollDirective.directive('backgroundDirective', ['$window', function ($window) {
+pollDirective.directive('backgroundDirective',
+   ['$window', function ($window) {
    return {
       restrict: "AE",
       link: function($scope, $element){
@@ -71,7 +72,7 @@ pollDirective.directive('backgroundDirective', ['$window', function ($window) {
          }
 
             // Determine whether width or height should be 100%
-            console.log("************");
+/*            console.log("************");
             console.log("PRINTING DATA");
             console.log("WINW:" + winW);
             console.log("WINH:    -" + winH);
@@ -80,7 +81,7 @@ pollDirective.directive('backgroundDirective', ['$window', function ($window) {
             console.log("************");
             console.log((winW / winH));
             console.log(($bg.width() / $bg.height()));
-            console.log((winW / winH) < ($bg.width() / $bg.height()));
+            console.log((winW / winH) < ($bg.width() / $bg.height()));*/
 
             if ((winW / winH) < ($bg.width() / $bg.height()) ||
                (winW / winH) === ($bg.width() / $bg.height()) ||
@@ -104,5 +105,20 @@ pollDirective.directive('backgroundDirective', ['$window', function ($window) {
 
       }
 
+   }
+}]);
+var A;
+pollDirective.directive('perfectDirective',
+   ['$window', function ($window) {
+   return {
+      restrict: "A",
+      link: function($scope, $element){
+         $scope.$on('$viewContentLoaded', function () {
+            $($element).perfectScrollbar({
+               wheelPropagation: true,
+               suppressScrollX: true,
+            });
+         });
+      }
    }
 }]);
