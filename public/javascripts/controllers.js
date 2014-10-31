@@ -219,7 +219,7 @@ pollsControler.controller('PollNewCtrl', ['$scope', '$location', 'Poll',
         };
 
      function _showPosition(position) {
-        var range = 0.35,
+        var range = 0.05,
             latitude = parseFloat(position.coords.latitude).toFixed(2),
             longitude = parseFloat(position.coords.longitude).toFixed(2);
 
@@ -250,7 +250,7 @@ pollsControler.controller('PollNewCtrl', ['$scope', '$location', 'Poll',
         .success(function(data, status, headers, config) {
             var data = data.elements
             $scope.dataAllAsync = [];
-            for(var i = 0; i < data.length; i++){
+            for(var i = 0; i < data.length && i < 20; i++){
                 if(_isNotUndefined(data[i].tags.name)){
                     $scope.dataAllAsync.push({
                         "name": data[i].tags.name,
@@ -281,7 +281,7 @@ pollsControler.controller('PollNewCtrl', ['$scope', '$location', 'Poll',
             $scope.dataAllAsync = [];
             $scope.dataCatAllAsync = [];
 
-            for(var i = 0; i < data.length; i++){
+            for(var i = 0; i < data.length && i < 20; i++){
                 if(_isNotUndefined(data[i].tags.name)){
                     $scope.dataAllAsync.push({
                         "name": data[i].tags.name,
