@@ -140,7 +140,7 @@ pollsControler.controller('PollNewCtrl', ['$scope', '$location', 'Poll',
     function ($scope, $location, Poll, $http, $routeParams) {
 
         $scope.routeParam = $routeParams.option;
-
+        $scope.limitOSMResults = 20;
         $scope.category  = false;
         if($scope.routeParam === "cuisine"){
             $scope.category = true;
@@ -245,12 +245,13 @@ pollsControler.controller('PollNewCtrl', ['$scope', '$location', 'Poll',
 
     // get openstreetmap JSON data from overpass API and save relevant data to variable osmJSON
     function _initRestaurants(coords) {
-        var url = "http://overpass.osm.rambler.ru/cgi/interpreter?data=[out:json];node[amenity=restaurant]("+coords.latitudeL+","+coords.longitudeL+","+coords.latitudeR+","+coords.longitudeR+");out;";
+        var url = "http://overpass.osm.rambler.ru/cgi/interpreter?data=[out:json];node[amenity=restaurant]("+coords.latitudeL+","+coords.longitudeL+","+coords.latitudeR+","+coords.longitudeR+");out%20" + $scope.limitOSMResults +";";
+        console.log(url);
         $http.get(url)
         .success(function(data, status, headers, config) {
             var data = data.elements
             $scope.dataAllAsync = [];
-            for(var i = 0; i < data.length && i < 20; i++){
+            for(var i = 0; i < data.length; i++){
                 if(_isNotUndefined(data[i].tags.name)){
                     $scope.dataAllAsync.push({
                         "name": data[i].tags.name,
@@ -273,7 +274,7 @@ pollsControler.controller('PollNewCtrl', ['$scope', '$location', 'Poll',
 
     // get openstreetmap JSON data from overpass API and save relevant data to variable osmJSON
     function _initCategories(coords) {
-        var url = "http://overpass.osm.rambler.ru/cgi/interpreter?data=[out:json];node[amenity=restaurant][cuisine]("+coords.latitudeL+","+coords.longitudeL+","+coords.latitudeR+","+coords.longitudeR+");out;";
+        var url = "http://overpass.osm.rambler.ru/cgi/interpreter?data=[out:json];node[amenity=restaurant][cuisine]("+coords.latitudeL+","+coords.longitudeL+","+coords.latitudeR+","+coords.longitudeR+");out%20" + $scope.limitOSMResults +";";
 
         $http.get(url)
         .success(function(data, status, headers, config) {
@@ -281,7 +282,7 @@ pollsControler.controller('PollNewCtrl', ['$scope', '$location', 'Poll',
             $scope.dataAllAsync = [];
             $scope.dataCatAllAsync = [];
 
-            for(var i = 0; i < data.length && i < 20; i++){
+            for(var i = 0; i < data.length; i++){
                 if(_isNotUndefined(data[i].tags.name)){
                     $scope.dataAllAsync.push({
                         "name": data[i].tags.name,
