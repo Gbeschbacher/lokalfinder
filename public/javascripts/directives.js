@@ -68,23 +68,28 @@ pollDirective.directive('backgroundDirective', ['$window', function ($window) {
 
                });
                console.log('url(http://wallpaperscraft.com/image/39288/' + chosenX + 'x'+ chosenY+'.jpg)');
-/*               $bg.css('background-image', 'url(http://wallpaperscraft.com/image/39288/' + chosenX + 'x'+ chosenY+'.jpg)');
-               console.log('url(http://wallpaperscraft.com/image/39288/' + chosenX + 'x'+ chosenY+'.jpg)');*/
          }
 
             // Determine whether width or height should be 100%
+            console.log("************");
+            console.log("PRINTING DATA");
+            console.log("WINW:" + winW);
+            console.log("WINH:    -" + winH);
+            console.log("BGW:    -" + $bg.width());
+            console.log("BGH:    -" + $bg.height());
             console.log("************");
             console.log((winW / winH));
             console.log(($bg.width() / $bg.height()));
             console.log((winW / winH) < ($bg.width() / $bg.height()));
 
             if ((winW / winH) < ($bg.width() / $bg.height()) ||
-               (winW / winH) === ($bg.width() / $bg.height())
+               (winW / winH) === ($bg.width() / $bg.height()) ||
+               ($bg.height() > winH)
                ) {
                $bg.css({height: '100%', width: 'auto'});
             }
              else {
-               $bg.css({width: '100%', height: 'auto'});
+               $bg.css({height: 'auto', width: '100%'});
             }
          }
 

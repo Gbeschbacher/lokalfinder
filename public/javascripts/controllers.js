@@ -14,7 +14,6 @@ pollsControler.controller('PollItemCtrl', ['$scope', '$routeParams', 'Poll', 'so
         $scope.chart.chartData = [];
         $scope.chart.noData = "Laden ...";
         $scope.leadingRestaurant = "";
-        $scope.category = Data.getCategory()
 
         $scope.chart.xFunction = function(){
             return function(d) {
@@ -32,6 +31,7 @@ pollsControler.controller('PollItemCtrl', ['$scope', '$routeParams', 'Poll', 'so
             _id: $routeParams.pollId
         }, function(data){
             $scope.poll = data;
+            $scope.category = $scope.poll.category
             $scope.poll.choices.sort(_sortArrayDesc);
             console.log($scope.poll)
             _checkIp($scope.poll._id).$promise.then(function (data){
@@ -213,7 +213,7 @@ pollsControler.controller('PollNewCtrl', ['$scope', '$location', 'Poll',
         };
 
      function _showPosition(position) {
-        var range = 0.15,
+        var range = 0.35,
             latitude = parseFloat(position.coords.latitude).toFixed(2),
             longitude = parseFloat(position.coords.longitude).toFixed(2);
 
@@ -224,8 +224,6 @@ pollsControler.controller('PollNewCtrl', ['$scope', '$location', 'Poll',
             longitudeR: parseFloat(longitude) + range
         };
 
-        console.log($routeParams.option);
-        console.log($routeParams.option === "cuisine");
         if ($scope.category) {
             _initCategories(coords); // show cuisine/food category picker
         }
