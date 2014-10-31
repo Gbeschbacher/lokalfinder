@@ -107,7 +107,7 @@ pollDirective.directive('backgroundDirective',
 
    }
 }]);
-var A;
+
 pollDirective.directive('perfectDirective',
    ['$window', function ($window) {
    return {
