@@ -38,7 +38,7 @@ pollsControler.controller('PollItemCtrl', ['$scope', '$routeParams', 'Poll', 'so
         }, function(data){
             $scope.poll = data;
             $scope.category = $scope.poll.category;
-            $scope.dataAsync =$scope.poll.dataAsync;
+            $scope.dataAsync = $scope.poll.dataAsync;
             $scope.poll.choices.sort(_sortArrayDesc);
             _checkIp($scope.poll._id).$promise.then(function (data){
                 var userVoted = data;
@@ -69,7 +69,9 @@ pollsControler.controller('PollItemCtrl', ['$scope', '$routeParams', 'Poll', 'so
                 _updateChart();
             }
         });
-
+        /*
+         * send user voting choice to database
+         */
         $scope.vote = function() {
             if(!$scope.disabled){
                 var pollId = $scope.poll._id,
@@ -95,7 +97,9 @@ pollsControler.controller('PollItemCtrl', ['$scope', '$routeParams', 'Poll', 'so
         $scope.getButtonColor = function(){
             return $scope.button;
         };
-
+        /*
+         * watches if user selected a voting choice
+         */
         $scope.$watch("poll.userVote", function (a, b){
             if(a || b ){
                 _checkIp($scope.poll._id).$promise.then(function (data){
@@ -112,11 +116,15 @@ pollsControler.controller('PollItemCtrl', ['$scope', '$routeParams', 'Poll', 'so
                 $scope.disabled = true;
             }
         }, true);
-
-         function _checkIp(pollId){
+        /*
+         * check if user already voted on Poll with given ID
+         */
+        function _checkIp(pollId){
             return CheckVote.query({_id: pollId});
         };
-
+        /*
+         * update pie chart data
+         */
         function _updateChart (){
             var data = [];
             for(var i=0; i < $scope.poll.choices.length; i++){
@@ -158,7 +166,9 @@ pollsControler.controller('PollNewCtrl', ['$scope', '$location', 'Poll',
         $scope.disabled = true;
         $scope.button = "danger";
 
-
+        /*
+         * update "createQuestion" Button (if user selected data from cuisine/restaurant picker)
+         */
         $scope.updateDataAsync = function(item, model){
             $scope.button = "success";
             if($scope.category){
