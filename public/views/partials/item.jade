@@ -1,0 +1,127 @@
+div.flexContainer.background
+    div.container
+        div.grid.row
+            div.row.col-xs-12
+                h1 Lokalfinder
+                div.row
+                    div.col-xs-12
+                h2 Abstimmen!
+
+div.margin-top-50
+    div.flexContainer
+        div.container
+            div.grid.row
+                div.row.col-xs-12.background.padding-15
+                    div.height-reset.color-black
+                        div(ng-hide='poll.userVoted')
+                            div(ng-if='category')
+                                p
+                                    |Bitte stimmen Sie ab in welches Restaurant sie gehen möchten. Als Küche wurde#{' '}
+                                    strong {{poll.dataAsync[0].cuisine}}
+                                    |#{' '}ausgewählt.
+                            div(ng-if='!category')
+                                p
+                                    |Bitte stimmen Sie ab, ob sie ins Restaurant#{' '}
+                                    strong {{poll.dataAsync[0].name}}
+                                    |#{' '}mitgehen möchten.
+
+                        div(ng-show='poll.userVoted')
+                            div(ng-if='category')
+                                p
+                                    | Die Umfrage handelt von der Küche #{' '}
+                                    strong {{dataAsync[0].cuisine}}
+                                    |. Sie haben sich für das Restaurant #{' '}
+                                    strong {{poll.userChoice.text}}
+                                    |#{' '}entschieden.
+
+                            div(ng-if='!category')
+                                p
+                                    | Die Umfrage handelt vom Restaurant#{' '}
+                                    strong {{dataAsync[0].name}}
+                                    |. Sie haben sich dafür entschieden#{' '}
+                                    strong {{poll.userChoice.text =="ja" | iif : "mitgehen" : "nicht mitgehen"}}
+                                    |#{' '}zu wollen.
+
+//- USER VOTING TABLE
+div(ng-hide='poll.userVoted')
+    div.margin-top-50
+        div.flexContainer
+            div.background.padding-15
+                div(ng-repeat='choice in poll.choices')
+                    label.input-group-addon.width-reset.color-black.border-radius-0.line-height-reset(for='{{choice._id}}')
+                        div.input-group.flexContainer.flexOptionals
+                            input(type='radio', name='choice', ng-model='poll.userVote', value='{{choice._id}}', ng-attr-id="{{choice._id}}")
+                            span.padding-0-15 {{choice.text}}
+                    div.row
+                        div.col-xs-12
+                label.input-group-addon.width-reset.color-black.border-radius-0.line-height-reset.width-height-100.padding-reset
+                    button.button.large(ng-class="getButtonColor()", ng-click='vote()', style="width:100%;") Stimme abgeben!
+    div.row
+        div.col-xs-12.margin-top-50
+
+//- SMALL VERSION OF RESULT TABLE
+//- div(ng-show='poll.userVoted')
+//-     div.margin-top-50
+//-         div.flexContainer
+//-             div.background.padding-15
+//-                 table.result-table
+//-                   tbody
+//-                     tr(ng-repeat='choice in poll.choices')
+//-                       td {{choice.text}}
+//-                       td
+//-                         table(style='width: {{choice.votes.length/poll.totalVotes*80}}%;')
+//-                           tbody
+//-                             tr
+//-                               td {{choice.votes.length}}
+
+
+//- BIG VERSION OF RESULT TABLE
+div(ng-show='poll.userVoted')
+    div.margin-top-50
+        div.flexContainer
+            div.container
+                div.grid.row
+                    div.row.col-xs-12.background.padding-15
+                        div.height-reset.color-black
+                            table.result-table
+                              tbody
+                                tr(ng-repeat='choice in poll.choices')
+                                  td {{choice.text}}
+                                  td
+                                    table(style='width: {{choice.votes.length/poll.totalVotes*80}}%;')
+                                      tbody
+                                        tr
+                                          td {{choice.votes.length}}
+
+//- PIE-CHART AS RESULT
+div.margin-top-50(ng-show='poll.userVoted')
+    div.flexContainer
+        div.container
+                div.row.col-xs-12
+                    div.height-reset.color-black.background.col-md-6.col-md-offset-3
+                        nvd3-pie-chart(
+                            data="chart.chartData",
+                            noData ="chart.noData"
+                            id="exampleId",
+                            x="chart.xFunction()",
+                            y="chart.yFunction()",
+                            showLabels="true",
+                            width=250,
+                            height=250)
+
+//- WHAT DID THE USER VOTE FOR
+//- div.margin-top-50(ng-show='poll.userChoice')
+//-     div.flexContainer
+//-         div.container
+//-             div.grid.row
+//-                 div.row.col-xs-12.background.padding-15
+//-                     div.height-reset.color-black
+//-                         p.votedForText
+//-                           span
+//-                             |Du hast für #{' '}
+//-                             strong {{poll.userChoice.text}}
+//-                             |#{' '}abgestimmt!
+
+
+
+

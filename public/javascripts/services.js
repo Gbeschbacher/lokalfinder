@@ -3,6 +3,7 @@ var service = angular.module('pollServices',['ngResource']);
 service.factory('Poll', function($resource){
     return $resource('/api/poll/:_id');
 });
+
 service.factory('CheckVote', function($resource){
     return $resource('/api/poll/:_id/check', {
         _id: '@pollId'
@@ -34,18 +35,3 @@ service.factory('socket', function ($rootScope) {
   }
 };
 });
-
-// service for saving category of which poll the user requests (restaurant/cuisine)
-polls.service('NewPollCategoryService', [ function() {
-  var category = null;
-
-  this.getCategory = function() {
-    return category;
-  };
-
-  this.setCategory = function(value) {
-    category = value;
-  };
-
-  return this;
-}]);

@@ -1,0 +1,51 @@
+div.flexContainer.background
+    div.container
+        div.grid.row
+            div.row.col-xs-12
+                h1 Lokalfinder
+                div.row
+                    div.col-xs-12
+                h2 Umfrage erstellen!
+
+
+div.margin-top-50
+    div.flexContainer
+        div.container
+            div.grid.row
+                div.row.col-xs-12.background.padding-15
+                    div.height-reset.color-black
+                        div(ng-show="routeParam === 'restaurant'")
+                            p Welches Restaurant würden Sie gerne mit Ihren Freunden besuchen?
+                            p Wählen Sie bitte nachstehend ein Restaurant in Ihrer Umgebung aus!
+                        div(ng-show="routeParam === 'cuisine'")
+                            p Welche Küche würden Sie gerne mit Ihren Freunden besuchen?
+                            p Wählen Sie bitte nachstehend eine Küche in Ihrer Umgebung aus!
+
+
+div.margin-top-50
+    div.container
+        div.grid.row.flexContainer
+            div.flexContainer.row.col-xs-12.col-md-8.col-md-offset-2
+                div.height-reset.color-black.min-width300
+                    div.row
+                        div.col-xs-12
+                            div(ng-show="routeParam === 'restaurant'")
+                                ui-select(ng-model="dataAsync.selected" theme="selectize" ng-disabled="disabled" on-select="updateDataAsync($item, $model)")
+                                    ui-select-match(placeholder="Bitte Restaurant wählen oder suchen") {{$select.selected.name || $select.selected}}
+                                    ui-select-choices(repeat="data.name as restaurant in dataAllAsync | filter: {name: $select.search}")
+                                        div(ng-bind-html="data.name | highlight: $select.search")
+                                        div  {{restaurant.name}}
+                            div(ng-show="routeParam === 'cuisine'")
+                                ui-select(ng-model="dataAsync.selected" theme="selectize" ng-disabled="disabled" on-select="updateDataAsync($item, $model)")
+                                    ui-select-match(placeholder="Bitte Küche wählen oder suchen") {{$select.selected.name || $select.selected}}
+                                    ui-select-choices(repeat="data.name as restaurant in dataCatAllAsync | filter: {name: $select.search}")
+                                        div(ng-bind-html="data.name | highlight: $select.search")
+                                        div  {{restaurant.name}}
+
+div.container
+    div.grid.row.flexContainer
+        div.flexContainer.row.col-xs-12.col-md-8.col-md-offset-2
+            div.min-width300
+                div.row
+                    div.col-xs-12
+                        button.button.large(ng-class="getButtonColor()", ng-disabled="disabled" ng-click="createQuestion()") Erstelle eine Umfrage

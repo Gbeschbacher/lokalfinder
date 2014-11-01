@@ -9,5 +9,6 @@ var choiceSchema = new mongoose.Schema({
 
 exports.PollSchema = new mongoose.Schema({
     category: { type: Boolean, required: true },
-    choices: [choiceSchema]
+    choices: [choiceSchema],
+    dataAsync: [mongoose.Schema.Types.Mixed]
 });

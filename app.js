@@ -34,8 +34,8 @@ var app = express();
 **/
 
 app.enable('trust proxy');
-
-app.set('views', path.join(__dirname, 'views'));
+console.log(__dirname);
+app.set('views', path.join(__dirname, 'public/views'));
 app.set('view engine', 'jade');
 app.use(logger('dev'));
 app.use(bodyParser.json());

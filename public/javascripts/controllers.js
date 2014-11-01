@@ -1,46 +1,45 @@
 var pollsControler = angular.module('pollsControler', []);
 
-pollsControler.controller('PollListCtrl', ['$scope', 'Poll', 'NewPollCategoryService',
-    function ($scope, Poll, NewPollCategoryService) {
+pollsControler.filter('iif', function () {
+   return function(input, trueValue, falseValue) {
+        return input ? trueValue : falseValue;
+   };
+});
+
+pollsControler.controller('PollListCtrl', ['$scope', 'Poll',
+    function ($scope, Poll) {
         $scope.polls = [];
         $scope.polls = Poll.query();
-        $scope.category = null;
-
-        $scope.newPoll = function() {
-            NewPollCategoryService.setCategory($scope.category);
-        };
     }
 ]);
 
 pollsControler.controller('PollItemCtrl', ['$scope', '$routeParams', 'Poll', 'socket', 'CheckVote',
     function ($scope, $routeParams, Poll, socket, CheckVote) {
         $scope.chartData = [];
-        $scope.chartOptions = {
-            chart: {
-                type: 'pieChart',
-                height: 300,
-                x: function(d){return d.key;},
-                y: function(d){return d.y;},
-                showLabels: true,
-                transitionDuration: 500,
-                labelThreshold: 0.01,
-                "showLegend": false,
-                "tooltips": false,
-            }
-        };
+        $scope.chart = {};
+        $scope.chart.chartData = [];
+        $scope.chart.noData = "Laden ...";
+        $scope.leadingRestaurant = "";
 
-        $scope.chartConfig = {
-            visible: false,
-            extended: true,
-            disabled: false,
-            autorefresh: true,
-            refreshDataOnly: false
-        };
+        $scope.chart.xFunction = function(){
+            return function(d) {
+                return d.key;
+            };
+        }
+
+        $scope.chart.yFunction = function(){
+            return function(d){
+                return d.y;
+            };
+        }
 
         Poll.get({
             _id: $routeParams.pollId
         }, function(data){
             $scope.poll = data;
+            $scope.category = $scope.poll.category;
+            $scope.dataAsync =$scope.poll.dataAsync;
+            $scope.poll.choices.sort(_sortArrayDesc);
             _checkIp($scope.poll._id).$promise.then(function (data){
                 var userVoted = data;
 
@@ -50,7 +49,6 @@ pollsControler.controller('PollItemCtrl', ['$scope', '$routeParams', 'Poll', 'so
                 }
 
                 _updateChart();
-                setTimeout(_updateChart, 350);
 
             });
         });
@@ -58,6 +56,7 @@ pollsControler.controller('PollItemCtrl', ['$scope', '$routeParams', 'Poll', 'so
         socket.on('myvote', function(data){
             if(data._id === $routeParams.pollId){
                 $scope.poll = data;
+                $scope.poll.choices.sort(_sortArrayDesc);
                 _updateChart();
             }
         });
@@ -66,27 +65,53 @@ pollsControler.controller('PollItemCtrl', ['$scope', '$routeParams', 'Poll', 'so
             if(data._id === $routeParams.pollId){
                 $scope.poll.choices = data.choices;
                 $scope.poll.totalVotes = data.totalVotes;
+                $scope.poll.choices.sort(_sortArrayDesc);
                 _updateChart();
             }
         });
 
         $scope.vote = function() {
-            var pollId = $scope.poll._id,
-                choiceId = $scope.poll.userVote;
+            if(!$scope.disabled){
+                var pollId = $scope.poll._id,
+                    choiceId = $scope.poll.userVote;
 
-            _checkIp(pollId).$promise.then(function (data){
-                var userVoted = data;
+                _checkIp(pollId).$promise.then(function (data){
+                    var userVoted = data;
 
-                if(!userVoted.userVoted){
-                    if(choiceId){
-                        var voteObj = {poll_id:pollId, choice: choiceId};
-                        socket.emit('send:vote', voteObj);
-                    } else{
-                        // choice in frontend is missing
+                    if(!userVoted.userVoted){
+                        if(choiceId){
+                            var voteObj = {poll_id:pollId, choice: choiceId};
+                            socket.emit('send:vote', voteObj);
+                        }
+                    }else{
+                        $scope.disabled = true;
+                        $scope.button = "danger";
                     }
-                }
-            });
+                }, function (data){
+                });
+            }
         };
+
+        $scope.getButtonColor = function(){
+            return $scope.button;
+        };
+
+        $scope.$watch("poll.userVote", function (a, b){
+            if(a || b ){
+                _checkIp($scope.poll._id).$promise.then(function (data){
+                    if(data.userVoted){
+                        $scope.button = "danger";
+                        $scope.disabled = true;
+                    }else{
+                        $scope.button = "success";
+                        $scope.disabled = false;
+                    }
+                });
+            }else{
+                $scope.button = "danger";
+                $scope.disabled = true;
+            }
+        }, true);
 
          function _checkIp(pollId){
             return CheckVote.query({_id: pollId});
@@ -97,57 +122,77 @@ pollsControler.controller('PollItemCtrl', ['$scope', '$routeParams', 'Poll', 'so
             for(var i=0; i < $scope.poll.choices.length; i++){
                 var obj = {
                     key: $scope.poll.choices[i].text,
-                    y: $scope.poll.choices[i].votes.length + Math.random()
+                    y: $scope.poll.choices[i].votes.length
                 };
                 data.push(obj);
             }
-            $scope.chartData = data;
-            $scope.api.refresh();
+            $scope.chart.chartData = data;
         }
 
+        function _sortArrayDesc(a,b){
+            return b.votes.length-a.votes.length
+        };
     }
 ]);
 
-pollsControler.controller('PollNewCtrl', ['$scope', '$location', 'Poll', 'NewPollCategoryService',
-    function ($scope, $location, Poll, NewPollCategoryService) {
+pollsControler.controller('PollNewCtrl', ['$scope', '$location', 'Poll',
+    '$http', '$routeParams',
+    function ($scope, $location, Poll, $http, $routeParams) {
 
-        $scope.category = NewPollCategoryService.getCategory();
+        $scope.routeParam = $routeParams.option;
+        $scope.limitOSMResults = 20;
+        $scope.category  = false;
+        if($scope.routeParam === "cuisine"){
+            $scope.category = true;
+        }
 
         $scope.poll = {
             category: $scope.category,
-            choices: []
+            choices: [],
+            dataAsync: []
+        };
+
+        $scope.dataAsync = {selected: "Daten werden geladen ..."};
+        $scope.dataAllAsync = [];
+        $scope.dataCatAllAsync = [];
+        $scope.disabled = true;
+        $scope.button = "danger";
+
+
+        $scope.updateDataAsync = function(item, model){
+            $scope.button = "success";
+            if($scope.category){
+                _addRestaurantsOfCategory(item.name);
+                $scope.dataAsync = $scope.poll.choices;
+            }else{
+                $scope.dataAsync[0] = item;
+            }
+        };
+
+        $scope.getButtonColor = function(){
+            return $scope.button;
         };
 
         $scope.createQuestion = function() {
-
-           if(typeof $scope.restaurantSelection != 'undefined'){
+           if(!$scope.category){
                 $scope.poll.choices = [
                     {text: "Ja"},
                     {text: "Nein"}
                 ]
-           }else if (typeof $scope.categorySelection != 'undefined'){
-                /*
-                write all available restaurants from the chosen category to var
-                    $scope.poll.choices = [{}, {}, {}]
-                */
-
-                $scope.poll.choices = cuisineRestaurants;
-
-           }else {
-                /*
-
-                */
            }
+
+           $scope.poll.dataAsync = $scope.dataAsync;
 
             var newPoll = new Poll($scope.poll);
 
-           //IF $SCOPE.CATEGORY === FALSE --> RESTAURANT MENU
-            newPoll.$save(function(p, resp){
-                if(!p.error){
-                    $location.path('poll/'+p._id);
-                } else {
-                }
-            });
+           if(!$scope.disabled){
+                newPoll.$save(function(p, resp){
+                    if(!p.error){
+                        $location.path('poll/'+p._id);
+                    } else {
+                    }
+                });
+            }
 
         };
 
@@ -155,24 +200,25 @@ pollsControler.controller('PollNewCtrl', ['$scope', '$location', 'Poll', 'NewPol
             Helper Functions
         */
 
-        function _checkForDoubleCategory(obj, x) {
+        function _checkForDoubleCategory(x) {
+            var obj = $scope.dataCatAllAsync;
             for (var i = 0; i < obj.length; i++) {
-                    if (x === obj[i].text) {
+                    if (x === obj[i].name) {
                         return true;
                     }
             }
             return false;
         }
 
-        function getLocation() {
+        function _getLocation() {
             if (navigator.geolocation) {
-               navigator.geolocation.getCurrentPosition(showPosition);
+               navigator.geolocation.getCurrentPosition(_showPosition);
             } else {
              // filler text ... geolocation not supported by client
             }
         };
 
-     function showPosition(position) {
+     function _showPosition(position) {
         var range = 0.05,
             latitude = parseFloat(position.coords.latitude).toFixed(2),
             longitude = parseFloat(position.coords.longitude).toFixed(2);
@@ -184,108 +230,101 @@ pollsControler.controller('PollNewCtrl', ['$scope', '$location', 'Poll', 'NewPol
             longitudeR: parseFloat(longitude) + range
         };
 
-        if ($scope.category === true) {
-            initCategories(coords); // show cuisine/food category picker
+        if ($scope.category) {
+            _initCategories(coords); // show cuisine/food category picker
         }
-        else if ($scope.category === false) {
-            initRestaurants(coords); // show restaurant category picker
-        }
-        else {
-            $location.path("/");
+        else{
+            _initRestaurants(coords); // show restaurant category picker
         }
     }
-    getLocation();
+    _getLocation();
 
-
-    var osmCategoryJSON = [];
-    var osmRestaurantsJSON = [];
-    var osmCategoryRestaurantsJSON = [];
-    var cuisineRestaurants = [];
-
-    // get openstreetmap JSON data from overpass API and save relevant data to variable osmJSON
-    function initRestaurants(coords) {
-        var url = "http://overpass.osm.rambler.ru/cgi/interpreter?data=[out:json];node[amenity=restaurant]("+coords.latitudeL+","+coords.longitudeL+","+coords.latitudeR+","+coords.longitudeR+");out;";
-
-        $.getJSON(url, function(json){
-            for (var i = 0; i < json.elements.length; i++) {
-                osmRestaurantsJSON.push({
-                    "id": i+1 ,
-                    "text": json.elements[i].tags.name ,
-                    "osmid":json.elements[i].id,
-                    "lat":json.elements[i].lat ,
-                    "lon":json.elements[i].lon
-                });
-            }
-
-        });
+    function _isNotUndefined(name){
+        return (typeof name !== "undefined")
     }
 
     // get openstreetmap JSON data from overpass API and save relevant data to variable osmJSON
-    function initCategories(coords) {
-        var url = "http://overpass.osm.rambler.ru/cgi/interpreter?data=[out:json];node[amenity=restaurant][cuisine]("+coords.latitudeL+","+coords.longitudeL+","+coords.latitudeR+","+coords.longitudeR+");out;";
-
-        $.getJSON(url, function(json){
-            for (var i = 0; i < json.elements.length; i++) {
-                osmCategoryRestaurantsJSON.push({
-                    "id":i+1 ,
-                    "name":json.elements[i].tags.name ,
-                    "cuisine":json.elements[i].tags.cuisine ,
-                    "osmid":json.elements[i].id,
-                    "lat":json.elements[i].lat ,
-                    "lon":json.elements[i].lon
-                });
-
-                // prohibit double entries to get a JSON with unique foods/cuisines
-                if (!_checkForDoubleCategory(osmCategoryJSON,json.elements[i].tags.cuisine)) {
-
-                    osmCategoryJSON.push({
-                        "id":i+1 ,
-                        "text":json.elements[i].tags.cuisine
+    function _initRestaurants(coords) {
+        var url = "http://overpass.osm.rambler.ru/cgi/interpreter?data=[out:json];node[amenity=restaurant]("+coords.latitudeL+","+coords.longitudeL+","+coords.latitudeR+","+coords.longitudeR+");out%20" + $scope.limitOSMResults +";";
+        console.log(url);
+        $http.get(url)
+        .success(function(data, status, headers, config) {
+            var data = data.elements
+            $scope.dataAllAsync = [];
+            for(var i = 0; i < data.length; i++){
+                if(_isNotUndefined(data[i].tags.name)){
+                    $scope.dataAllAsync.push({
+                        "name": data[i].tags.name,
+                        "lat" : data[i].lat,
+                        "lon" : data[i].lon
                     });
                 }
             }
+            if($scope.dataAllAsync.length > 0){
+                $scope.disabled = false;
+                $scope.dataAsync = {selected: "Bitte wählen oder suchen ..."};
+            }
+        })
+        .error(function(data, status, headers, config) {
+            console.error(data);
+            $scope.dataAsync.selected = "Fehler aufgetreten!";
+            $scope.disabled = true;
         });
     }
 
-    function addCategoryRestaurants() {
-        for (var i = 0; i < osmCategoryRestaurantsJSON.length; i++) {
-            if (osmCategoryRestaurantsJSON[i].cuisine === $scope.categorySelection.text) {
-                cuisineRestaurants.push({
-                    "id":osmCategoryRestaurantsJSON[i].id ,
-                    "text":osmCategoryRestaurantsJSON[i].name ,
-                    "cuisine":osmCategoryRestaurantsJSON[i].cuisine ,
-                    "osmid":osmCategoryRestaurantsJSON[i].osmid,
-                    "lat":osmCategoryRestaurantsJSON[i].lat ,
-                    "lon":osmCategoryRestaurantsJSON[i].lon
+    // get openstreetmap JSON data from overpass API and save relevant data to variable osmJSON
+    function _initCategories(coords) {
+        var url = "http://overpass.osm.rambler.ru/cgi/interpreter?data=[out:json];node[amenity=restaurant][cuisine]("+coords.latitudeL+","+coords.longitudeL+","+coords.latitudeR+","+coords.longitudeR+");out%20" + $scope.limitOSMResults +";";
+
+        $http.get(url)
+        .success(function(data, status, headers, config) {
+            var data = data.elements
+            $scope.dataAllAsync = [];
+            $scope.dataCatAllAsync = [];
+
+            for(var i = 0; i < data.length; i++){
+                if(_isNotUndefined(data[i].tags.name)){
+                    $scope.dataAllAsync.push({
+                        "name": data[i].tags.name,
+                        "lat" : data[i].lat,
+                        "lon" : data[i].lon,
+                        "cuisine": data[i].tags.cuisine
+                    });
+
+                    if (!_checkForDoubleCategory(data[i].tags.cuisine)) {
+                            $scope.dataCatAllAsync .push({
+                                "name": data[i].tags.cuisine
+                            });
+                    }
+                }
+            }
+            if($scope.dataCatAllAsync.length > 0){
+                $scope.disabled = false;
+                $scope.dataAsync = {selected: "Bitte wählen oder suchen ..."};
+            }
+        })
+        .error(function(data, status, headers, config) {
+            console.error(data);
+            $scope.dataAsync.selected = "Fehler aufgetreten!";
+            $scope.disabled = true;
+        });
+    }
+
+    function _addRestaurantsOfCategory(_cuisine) {
+        var data = $scope.dataAllAsync;
+        $scope.poll.choices = [];
+        for (var i = 0; i < data.length; i++) {
+            if (data[i].cuisine === _cuisine) {
+                $scope.poll.choices.push({
+                    "text":data[i].name ,
+                    "cuisine":data[i].cuisine,
+                    "lat":data[i].lat ,
+                    "lon":data[i].lon
                 });
             }
         }
     }
 
-    $('#selectRestaurant').select2({
-        data: osmRestaurantsJSON,
-        placeholder: "Wähle ein Restaurant...",
-        multiple: false,
-        width: "270px"
-    });
-
-
-    $('#selectCategory').select2({
-        data: osmCategoryJSON,
-        placeholder: "Wähle eine Küche...",
-        multiple: false,
-        width: "270px"
-    });
-
-    $("#selectRestaurant").on("change", function() {
-        $scope.restaurantSelection = $('#selectRestaurant').select2('data');
-    });
-
-
-    $("#selectCategory").on("change", function() {
-        $scope.categorySelection = $('#selectCategory').select2('data');
-        addCategoryRestaurants();
-    });
 }
 ]);
 

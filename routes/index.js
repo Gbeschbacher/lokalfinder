@@ -12,7 +12,7 @@ exports.index = function(req, res){
 };
 
 exports.partials = function(req, res){
-    res.render('partials/' + req.params.name + '.html');
+    res.render('partials/' + req.params.name);
 };
 
 exports.list = function(req, res){
@@ -60,10 +60,11 @@ exports.poll = function(req, res){
 };
 
 exports.create = function(req, res) {
-    var reqBody = req.body;
-    var choices = reqBody.choices;
-
-    pollObj = {category: reqBody.category, choices: choices};
+    pollObj = {
+        category: req.body.category,
+        choices: req.body.choices,
+        dataAsync: req.body.dataAsync
+    };
 
     var poll = new Poll(pollObj);
     poll.save(function(err, doc) {
