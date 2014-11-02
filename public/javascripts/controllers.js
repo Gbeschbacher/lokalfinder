@@ -20,6 +20,8 @@ pollsControler.controller('PollItemCtrl', ['$scope', '$routeParams', 'Poll', 'so
         $scope.chart.chartData = [];
         $scope.chart.noData = "Laden ...";
         $scope.leadingRestaurant = "";
+        $scope.map = [];
+        $scope.markers = [];
 
         $scope.chart.xFunction = function(){
             return function(d) {
@@ -132,6 +134,36 @@ pollsControler.controller('PollItemCtrl', ['$scope', '$routeParams', 'Poll', 'so
         function _sortArrayDesc(a,b){
             return b.votes.length-a.votes.length
         };
+        /*
+         * initiate google Map for restaurants
+         */
+        $scope.initMap = function(lat, lon) {
+            var mapOptions = {
+                zoom: 20,
+                center: new google.maps.LatLng(lat, lon),
+                mapTypeId: google.maps.MapTypeId.TERRAIN
+            }
+
+            $scope.map = new google.maps.Map(document.getElementById('gmap'), mapOptions);
+        }
+        /*
+         * create map markers for restaurants on google map
+         */
+        $scope.createMapMarker = function(lat, lon, name) {
+            var marker = new google.maps.Marker({
+                map: $scope.map,
+                position: new google.maps.LatLng(lat, lon),
+                title: name
+            });
+            marker.content = '<div class="markerContent">' + name + '</div>';
+
+            google.maps.event.addListener(marker, 'click', function(){
+                infoWindow.setContent('<h2>' + marker.title + '</h2>' + marker.content);
+                infoWindow.open($scope.map, marker);
+            });
+
+            $scope.markers.push(marker);    
+        }
     }
 ]);
 

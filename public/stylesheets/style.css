@@ -147,6 +147,15 @@ html, body {
 }
 
 /**
+    Google Maps Container
+**/
+
+#gmap {
+    height:200px;
+    width:350px;
+}
+
+/**
     Radio
 * */
 
