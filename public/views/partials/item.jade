@@ -42,7 +42,7 @@ div.margin-top-50
                                     strong {{poll.userChoice.text =="ja" | iif : "mitgehen" : "nicht mitgehen"}}
                                     |#{' '}zu wollen.
 
-div(ng-if='!category').margin-top-20
+div(ng-if='!category || poll.userVoted').margin-top-20
     div.flexContainer
         div.background.padding-15
             {{initMap(dataAsync[0].lat, dataAsync[0].lon)}}
