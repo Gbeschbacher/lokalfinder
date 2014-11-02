@@ -40,7 +40,7 @@ pollsControler.controller('PollItemCtrl', ['$scope', '$routeParams', 'Poll', 'so
         }, function(data){
             $scope.poll = data;
             $scope.category = $scope.poll.category;
-            $scope.dataAsync =$scope.poll.dataAsync;
+            $scope.dataAsync = $scope.poll.dataAsync;
             $scope.poll.choices.sort(_sortArrayDesc);
             _checkIp($scope.poll._id).$promise.then(function (data){
                 var userVoted = data;
@@ -71,7 +71,9 @@ pollsControler.controller('PollItemCtrl', ['$scope', '$routeParams', 'Poll', 'so
                 _updateChart();
             }
         });
-
+        /*
+         * send user voting choice to database
+         */
         $scope.vote = function() {
             if(!$scope.disabled){
                 var pollId = $scope.poll._id,
@@ -97,7 +99,9 @@ pollsControler.controller('PollItemCtrl', ['$scope', '$routeParams', 'Poll', 'so
         $scope.getButtonColor = function(){
             return $scope.button;
         };
-
+        /*
+         * watches if user selected a voting choice
+         */
         $scope.$watch("poll.userVote", function (a, b){
             if(a || b ){
                 _checkIp($scope.poll._id).$promise.then(function (data){
@@ -114,11 +118,15 @@ pollsControler.controller('PollItemCtrl', ['$scope', '$routeParams', 'Poll', 'so
                 $scope.disabled = true;
             }
         }, true);
-
-         function _checkIp(pollId){
+        /*
+         * check if user already voted on Poll with given ID
+         */
+        function _checkIp(pollId){
             return CheckVote.query({_id: pollId});
         };
-
+        /*
+         * update pie chart data
+         */
         function _updateChart (){
             var data = [];
             for(var i=0; i < $scope.poll.choices.length; i++){
@@ -184,7 +192,9 @@ pollsControler.controller('PollNewCtrl', ['$scope', '$location', 'Poll',
         $scope.disabled = true;
         $scope.button = "danger";
 
-
+        /*
+         * update "createQuestion" Button (if user selected data from cuisine/restaurant picker)
+         */
         $scope.updateDataAsync = function(item, model){
             $scope.button = "success";
             if($scope.category){
@@ -199,6 +209,9 @@ pollsControler.controller('PollNewCtrl', ['$scope', '$location', 'Poll',
             return $scope.button;
         };
 
+        /*
+         * create new poll question
+         */
         $scope.createQuestion = function() {
            if(!$scope.category){
                 $scope.poll.choices = [
@@ -219,13 +232,16 @@ pollsControler.controller('PollNewCtrl', ['$scope', '$location', 'Poll',
                     }
                 });
             }
-
         };
 
-        /*
-            Helper Functions
-        */
+        /*  
+         * Helper Functions
+         */
 
+        /*
+         * used to filter cuisine category double entries
+         * used by _initCategories function
+         */
         function _checkForDoubleCategory(x) {
             var obj = $scope.dataCatAllAsync;
             for (var i = 0; i < obj.length; i++) {
@@ -236,6 +252,9 @@ pollsControler.controller('PollNewCtrl', ['$scope', '$location', 'Poll',
             return false;
         }
 
+        /* 
+         * get user location (html5 geolocation)
+         */
         function _getLocation() {
             if (navigator.geolocation) {
                navigator.geolocation.getCurrentPosition(_showPosition);
@@ -244,114 +263,125 @@ pollsControler.controller('PollNewCtrl', ['$scope', '$location', 'Poll',
             }
         };
 
-     function _showPosition(position) {
-        var range = 0.05,
+        /*
+         * get details of user position
+         * initiate restaurant data call according to selected category
+         */
+        function _showPosition(position) {
+            var range = 0.05,
             latitude = parseFloat(position.coords.latitude).toFixed(2),
             longitude = parseFloat(position.coords.longitude).toFixed(2);
 
-        var coords = {
-            longitudeL: parseFloat(longitude) - range,
-            latitudeL: parseFloat(latitude) - range,
-            latitudeR: parseFloat(latitude) + range,
-            longitudeR: parseFloat(longitude) + range
-        };
+            var coords = {
+                longitudeL: parseFloat(longitude) - range,
+                latitudeL: parseFloat(latitude) - range,
+                latitudeR: parseFloat(latitude) + range,
+                longitudeR: parseFloat(longitude) + range
+            };
 
-        if ($scope.category) {
-            _initCategories(coords); // show cuisine/food category picker
+            if ($scope.category) {
+                _initCategories(coords); // show cuisine/food category picker
+            }
+            else{
+                _initRestaurants(coords); // show restaurant category picker
+            }
         }
-        else{
-            _initRestaurants(coords); // show restaurant category picker
+
+        _getLocation();
+
+        function _isNotUndefined(name){
+            return (typeof name !== "undefined")
         }
-    }
-    _getLocation();
-
-    function _isNotUndefined(name){
-        return (typeof name !== "undefined")
-    }
-
-    // get openstreetmap JSON data from overpass API and save relevant data to variable osmJSON
-    function _initRestaurants(coords) {
-        var url = "http://overpass.osm.rambler.ru/cgi/interpreter?data=[out:json];node[amenity=restaurant]("+coords.latitudeL+","+coords.longitudeL+","+coords.latitudeR+","+coords.longitudeR+");out%20" + $scope.limitOSMResults +";";
-        console.log(url);
-        $http.get(url)
-        .success(function(data, status, headers, config) {
-            var data = data.elements
-            $scope.dataAllAsync = [];
-            for(var i = 0; i < data.length; i++){
-                if(_isNotUndefined(data[i].tags.name)){
-                    $scope.dataAllAsync.push({
-                        "name": data[i].tags.name,
-                        "lat" : data[i].lat,
-                        "lon" : data[i].lon
-                    });
+        /*
+        * get openstreetmap JSON data from overpass API
+        * add all restaurants to $scope.dataAllAsync
+        */
+        function _initRestaurants(coords) {
+            var url = "http://overpass.osm.rambler.ru/cgi/interpreter?data=[out:json];node[amenity=restaurant]("+coords.latitudeL+","+coords.longitudeL+","+coords.latitudeR+","+coords.longitudeR+");out%20" + $scope.limitOSMResults +";";
+            console.log(url);
+            $http.get(url)
+            .success(function(data, status, headers, config) {
+                var data = data.elements
+                $scope.dataAllAsync = [];
+                for(var i = 0; i < data.length; i++){
+                    if(_isNotUndefined(data[i].tags.name)){
+                        $scope.dataAllAsync.push({
+                            "name": data[i].tags.name,
+                            "lat" : data[i].lat,
+                            "lon" : data[i].lon
+                        });
+                    }
                 }
-            }
-            if($scope.dataAllAsync.length > 0){
-                $scope.disabled = false;
-                $scope.dataAsync = {selected: "Bitte wählen oder suchen ..."};
-            }
-        })
-        .error(function(data, status, headers, config) {
-            console.error(data);
-            $scope.dataAsync.selected = "Fehler aufgetreten!";
-            $scope.disabled = true;
-        });
-    }
+                if($scope.dataAllAsync.length > 0){
+                    $scope.disabled = false;
+                    $scope.dataAsync = {selected: "Bitte wählen oder suchen ..."};
+                }
+            })
+            .error(function(data, status, headers, config) {
+                console.error(data);
+                $scope.dataAsync.selected = "Fehler aufgetreten!";
+                $scope.disabled = true;
+            });
+        }
+        /*
+        * get openstreetmap JSON data from overpass API
+        * add all restaurants to $scope.dataAllAsync
+        * add all different (no duplicates) restaurant categories to $scope.dataCatAllAsync
+        */
+        function _initCategories(coords) {
+            var url = "http://overpass.osm.rambler.ru/cgi/interpreter?data=[out:json];node[amenity=restaurant][cuisine]("+coords.latitudeL+","+coords.longitudeL+","+coords.latitudeR+","+coords.longitudeR+");out%20" + $scope.limitOSMResults +";";
 
-    // get openstreetmap JSON data from overpass API and save relevant data to variable osmJSON
-    function _initCategories(coords) {
-        var url = "http://overpass.osm.rambler.ru/cgi/interpreter?data=[out:json];node[amenity=restaurant][cuisine]("+coords.latitudeL+","+coords.longitudeL+","+coords.latitudeR+","+coords.longitudeR+");out%20" + $scope.limitOSMResults +";";
+            $http.get(url)
+            .success(function(data, status, headers, config) {
+                var data = data.elements
+                $scope.dataAllAsync = [];
+                $scope.dataCatAllAsync = [];
 
-        $http.get(url)
-        .success(function(data, status, headers, config) {
-            var data = data.elements
-            $scope.dataAllAsync = [];
-            $scope.dataCatAllAsync = [];
+                for(var i = 0; i < data.length; i++){
+                    if(_isNotUndefined(data[i].tags.name)){
+                        $scope.dataAllAsync.push({
+                            "name": data[i].tags.name,
+                            "lat" : data[i].lat,
+                            "lon" : data[i].lon,
+                            "cuisine": data[i].tags.cuisine
+                        });
 
-            for(var i = 0; i < data.length; i++){
-                if(_isNotUndefined(data[i].tags.name)){
-                    $scope.dataAllAsync.push({
-                        "name": data[i].tags.name,
-                        "lat" : data[i].lat,
-                        "lon" : data[i].lon,
-                        "cuisine": data[i].tags.cuisine
-                    });
-
-                    if (!_checkForDoubleCategory(data[i].tags.cuisine)) {
+                        if (!_checkForDoubleCategory(data[i].tags.cuisine)) {
                             $scope.dataCatAllAsync .push({
                                 "name": data[i].tags.cuisine
                             });
+                        }
                     }
                 }
-            }
-            if($scope.dataCatAllAsync.length > 0){
-                $scope.disabled = false;
-                $scope.dataAsync = {selected: "Bitte wählen oder suchen ..."};
-            }
-        })
-        .error(function(data, status, headers, config) {
-            console.error(data);
-            $scope.dataAsync.selected = "Fehler aufgetreten!";
-            $scope.disabled = true;
-        });
-    }
-
-    function _addRestaurantsOfCategory(_cuisine) {
-        var data = $scope.dataAllAsync;
-        $scope.poll.choices = [];
-        for (var i = 0; i < data.length; i++) {
-            if (data[i].cuisine === _cuisine) {
-                $scope.poll.choices.push({
-                    "text":data[i].name ,
-                    "cuisine":data[i].cuisine,
-                    "lat":data[i].lat ,
-                    "lon":data[i].lon
-                });
+                if($scope.dataCatAllAsync.length > 0){
+                    $scope.disabled = false;
+                    $scope.dataAsync = {selected: "Bitte wählen oder suchen ..."};
+                }
+            })
+            .error(function(data, status, headers, config) {
+                console.error(data);
+                $scope.dataAsync.selected = "Fehler aufgetreten!";
+                $scope.disabled = true;
+            });
+        }
+        /*
+        * add all restaurants of the selected cuisine category to $scope.poll.choices
+        */
+        function _addRestaurantsOfCategory(_cuisine) {
+            var data = $scope.dataAllAsync;
+            $scope.poll.choices = [];
+            for (var i = 0; i < data.length; i++) {
+                if (data[i].cuisine === _cuisine) {
+                    $scope.poll.choices.push({
+                        "text":data[i].name ,
+                        "cuisine":data[i].cuisine,
+                        "lat":data[i].lat ,
+                        "lon":data[i].lon
+                    });
+                }
             }
         }
     }
-
-}
 ]);
 
 
