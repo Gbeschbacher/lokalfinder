@@ -139,9 +139,10 @@ pollsControler.controller('PollItemCtrl', ['$scope', '$routeParams', 'Poll', 'so
          */
         $scope.initMap = function(lat, lon) {
             var mapOptions = {
-                zoom: 20,
+                zoom: 16,
                 center: new google.maps.LatLng(lat, lon),
-                mapTypeId: google.maps.MapTypeId.TERRAIN
+                mapTypeId: google.maps.MapTypeId.HYBRID,
+                disableDefaultUI:true
             }
 
             $scope.map = new google.maps.Map(document.getElementById('gmap'), mapOptions);
@@ -155,13 +156,6 @@ pollsControler.controller('PollItemCtrl', ['$scope', '$routeParams', 'Poll', 'so
                 position: new google.maps.LatLng(lat, lon),
                 title: name
             });
-            marker.content = '<div class="markerContent">' + name + '</div>';
-
-            google.maps.event.addListener(marker, 'click', function(){
-                infoWindow.setContent('<h2>' + marker.title + '</h2>' + marker.content);
-                infoWindow.open($scope.map, marker);
-            });
-
             $scope.markers.push(marker);    
         }
     }
