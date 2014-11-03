@@ -1,5 +1,8 @@
 var pollDirective = angular.module("pollDirective", [])
 
+/*
+ * directive for responsive background image
+ */
 pollDirective.directive('backgroundDirective',
    ['$window', function ($window) {
    return {

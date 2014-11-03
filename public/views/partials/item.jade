@@ -41,6 +41,13 @@ div.margin-top-50
                                     |. Sie haben sich dafür entschieden#{' '}
                                     strong {{poll.userChoice.text =="ja" | iif : "mitgehen" : "nicht mitgehen"}}
                                     |#{' '}zu wollen.
+//- GOOGLE MAP RESTAURANT POSITION
+div(ng-if='!category || poll.userVoted').margin-top-20
+    div.flexContainer
+        div.background.padding-15
+            {{initMap(dataAsync[0].lat, dataAsync[0].lon)}}
+            {{createMapMarker(dataAsync[0].lat, dataAsync[0].lon, dataAsync[0].name)}}
+            #gmap
 
 //- USER VOTING TABLE
 div(ng-hide='poll.userVoted')
